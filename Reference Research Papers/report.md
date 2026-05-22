@@ -1,7 +1,7 @@
 # Comprehensive Synthesis Report: Agricultural Innovation, Digital Platforms, and Crop Disease Detection
 
-**Report Type:** Multi-Paper Academic Synthesis 
-**Papers Reviewed:** 6  
+**Report Type:** Multi-Paper Academic Synthesis
+**Papers Reviewed:** 10  
 **Date:** May 2026  
 **Domain:** Agricultural Technology, Digital Innovation, Precision Agriculture, and AI Evaluation
 
@@ -9,14 +9,14 @@
 
 ## Executive Summary
 
-This comprehensive synthesis report integrates findings from six interconnected research papers spanning agricultural innovation, digital platforms, machine learning applications, and artificial intelligence evaluation. The papers address agricultural transformation through six converging lenses: (1) social networks and farmer technology adoption (Thailand), (2) cloud-based digital platforms for farmer communication and market access, (3) machine learning for crop disease detection, (4) image-based plant water stress estimation for irrigation management, (5) multispectral machine learning for crop phenotyping and drought tolerance assessment, and (6) retrieval-augmented generation systems for context-aware agricultural knowledge delivery. Collectively, these works articulate a vision for **AI-augmented, socially-embedded, digitally-enabled agricultural transformation** — where sensor networks generate real-time crop stress data, machine learning models convert data to actionable insights, retrieval-augmented systems synthesize knowledge with farmer-specific context, and farmer social networks accelerate adoption of evidence-based management practices. While each paper addresses distinct components, together they reveal both the promise and persistent tensions in deploying agricultural AI in resource-constrained smallholder settings.
+This comprehensive synthesis report integrates findings from ten interconnected research papers spanning agricultural innovation, digital platforms, machine learning (including Vision Transformers), and artificial intelligence evaluation. The papers address agricultural transformation through ten converging lenses: (1) social networks and farmer technology adoption, (2) cloud-based digital platforms, (3) machine learning for crop disease detection, (4) image-based plant water stress estimation, (5) multispectral ML for crop phenotyping, (6) retrieval-augmented generation systems, (7) AI chatbots for smart agriculture, (8) precision leaf analysis with Vision Transformers (PLA-ViT), (9) gamification in agricultural extension, and (10) ViT-SmartAgri smartphone apps for disease detection. Collectively, these works articulate a vision for **AI-augmented, socially-embedded, digitally-enabled agricultural transformation** — where sensor networks generate real-time crop stress data, machine learning models convert data to actionable insights, retrieval-augmented systems synthesize knowledge with farmer-specific context, and farmer social networks accelerate adoption of evidence-based management practices. While each paper addresses distinct components, together they reveal both the promise and persistent tensions in deploying agricultural AI in resource-constrained smallholder settings.
 
 ---
 
 ## Paper 1: Fostering Innovation Through Farmer Interactions — Social Networks and Technology
 
 **Authors:** Boyeong Park, Taeyoon Kim, Donghwan An & Phumsith Mahasuweerachai  
-**Published in:** *The Journal of Agricultural Education and Extension*, July 2025  
+**Published in:** _The Journal of Agricultural Education and Extension_, July 2025  
 **DOI:** 10.1080/1389224X.2025.2533178
 
 ---
@@ -34,6 +34,7 @@ The paper is motivated by a notable gap in the literature: while prior research 
 ### 1.2 Research Objectives
 
 The study investigates:
+
 - How farmers' positions within social knowledge-exchange networks influence their adoption of five key SRP-themed rice production technologies.
 - Whether outward information sharing (giving information) versus inward information receiving predicts adoption differently.
 - How correlated adoption decisions across multiple technologies can be modeled simultaneously.
@@ -48,13 +49,13 @@ The study was conducted in **nine provinces across Central and Northeastern Thai
 
 The five technologies studied, classified under SRP Version 2.1, were:
 
-| Technology | Adoption Rate |
-|---|---|
-| Straw Baling & Post-Harvest Management | 64% |
-| Crop Rotation or Cover Crop (CRCC) | 30% |
-| Water Resource Management | 29% |
-| Fertilizer Control | 23% |
-| Pesticide Control | 20% |
+| Technology                             | Adoption Rate |
+| -------------------------------------- | ------------- |
+| Straw Baling & Post-Harvest Management | 64%           |
+| Crop Rotation or Cover Crop (CRCC)     | 30%           |
+| Water Resource Management              | 29%           |
+| Fertilizer Control                     | 23%           |
+| Pesticide Control                      | 20%           |
 
 The resulting social network comprised **1,012 connected nodes** and **659 directed ties**, with a network density of 0.00064 — indicating a sparse but meaningful web of knowledge exchange.
 
@@ -91,13 +92,14 @@ These metrics were integrated as explanatory variables in the multivariate probi
 The effect is most pronounced for farmers with high **outdegree** (those who actively share information with others). Notably, the significance of the network holds **across all four network configurations** tested — degree, indegree, outdegree, betweenness, and closeness — but the **outdegree specification** produces significant effects for all technologies influenced by the network.
 
 Partial effect estimates reveal:
+
 - **+8%** increase in water management adoption per additional network connection (degree centrality)
 - **+4.5–5.4%** increase for CRCC and agrochemical controls (CRCC, fertilizer, pesticide) per connection
 - Outdegree effects consistently **larger** than indegree effects for CRCC, fertilizer, and pesticide control
 
 #### The "Gossip" Effect
 
-Drawing on Banerjee et al. (2019), the authors interpret outdegree as a proxy for what is termed the **"gossip nominee"** role — a farmer who actively disseminates information and thereby both shapes and reflects their own knowledge of technologies. This is a distinctive and counterintuitive finding: it is not how much information a farmer *receives* that most strongly predicts adoption, but how much they *give*.
+Drawing on Banerjee et al. (2019), the authors interpret outdegree as a proxy for what is termed the **"gossip nominee"** role — a farmer who actively disseminates information and thereby both shapes and reflects their own knowledge of technologies. This is a distinctive and counterintuitive finding: it is not how much information a farmer _receives_ that most strongly predicts adoption, but how much they _give_.
 
 #### Correlated Technology Adoption
 
@@ -114,7 +116,8 @@ Positive adoption correlations were found across most technology pairs — parti
 
 ### 1.6 Policy Implications
 
-The study recommends a **paradigm shift** in agricultural extension policy: from identifying information *recipients* to recognizing and empowering **information providers** within farmer networks. Programs should:
+The study recommends a **paradigm shift** in agricultural extension policy: from identifying information _recipients_ to recognizing and empowering **information providers** within farmer networks. Programs should:
+
 - Map social networks within rural communities to identify key knowledge hubs
 - Incentivize farmers who play central "gossip" roles to engage in technology demonstration
 - Support outward information flows, not just information delivery to passive recipients
@@ -132,7 +135,7 @@ The study recommends a **paradigm shift** in agricultural extension policy: from
 ## Paper 2: Transforming Agriculture Through Cloud-Based Social Networking Applications
 
 **Author:** Lalita Devi Pila  
-**Published in:** *International Journal of Scientific Research in Computer Science, Engineering and Information Technology*, January 2025  
+**Published in:** _International Journal of Scientific Research in Computer Science, Engineering and Information Technology_, January 2025  
 **DOI:** 10.32628/CSEIT25111225
 
 ---
@@ -165,13 +168,13 @@ This is a **review and synthesis article**, drawing on multiple research studies
 
 Digital platforms — including mobile apps and social media — have fundamentally altered how agricultural information travels. Research from Indian agricultural communities demonstrates that extension workers using digital platforms can maintain **continuous contact** with farmers, resulting in improved innovation adoption rates. Key shifts documented include:
 
-| Agricultural Activity | Traditional Approach | Digital Platform Approach | Primary Benefit |
-|---|---|---|---|
-| Extension Services | In-person visits | Mobile apps & social media | Improved innovation adoption |
-| Weather Information | Radio/TV | Real-time mobile updates | Better crop planning |
-| Pest Management | Local observation | Rapid outbreak alerts | Faster response time |
-| Market Information | Local middlemen | Direct digital access | Informed pricing decisions |
-| Expert Consultation | Physical meetings | Continuous online engagement | Timely problem-solving |
+| Agricultural Activity | Traditional Approach | Digital Platform Approach    | Primary Benefit              |
+| --------------------- | -------------------- | ---------------------------- | ---------------------------- |
+| Extension Services    | In-person visits     | Mobile apps & social media   | Improved innovation adoption |
+| Weather Information   | Radio/TV             | Real-time mobile updates     | Better crop planning         |
+| Pest Management       | Local observation    | Rapid outbreak alerts        | Faster response time         |
+| Market Information    | Local middlemen      | Direct digital access        | Informed pricing decisions   |
+| Expert Consultation   | Physical meetings    | Continuous online engagement | Timely problem-solving       |
 
 The ability to access **real-time weather forecasting** has proven especially valuable in climate-variable regions, enabling more informed planting, irrigation, and harvest decisions.
 
@@ -184,6 +187,7 @@ The study cites India-based evidence showing how **participatory online learning
 #### Collaborative Problem-Solving
 
 For smallholder farmers, digital collaborative networks provide access to:
+
 - Peer-to-peer experience sharing
 - Remote expert consultation
 - Localized adaptation of global best practices
@@ -195,6 +199,7 @@ Research highlights how **user-centered design** in agricultural platforms is cr
 India's implementation of digital agriculture has led to precision farming advances through the integration of remote sensing, weather forecasting, and market intelligence into unified decision-support systems. Big data analytics enables farmers to move from **intuition-based** to **evidence-based decision-making**, identifying complex patterns in crop growth, weather, and market dynamics.
 
 Resource Optimization Metrics reported include:
+
 - 75–82% resource efficiency improvement through integrated farming systems
 - 68–85% stakeholder adoption across various digital collaboration modalities
 - Significant sustainability impacts through improved supply chain coordination
@@ -202,6 +207,7 @@ Resource Optimization Metrics reported include:
 #### Market Intelligence and Access
 
 Digital platforms are dismantling traditional market gatekeeping. In Indian agricultural markets, platforms enable farmers to access price data from **multiple mandis (markets)** simultaneously, reducing dependence on local intermediaries and enabling:
+
 - Direct buyer connections
 - Real-time price discovery
 - Informed decisions about crop sales timing and destination
@@ -209,6 +215,7 @@ Digital platforms are dismantling traditional market gatekeeping. In Indian agri
 #### Community Development
 
 Beyond operational tools, digital platforms function as **social infrastructure** — building social capital, strengthening rural resilience, and facilitating collective action. Community-based digital networks enable both formal and informal knowledge exchange, creating more cohesive and adaptive agricultural communities. Effectiveness rates documented include:
+
 - Collective action & knowledge sharing: **85% impact rate**
 - Policy engagement: **72% impact rate**
 - Social capital building: **75–82% impact and implementation success**
@@ -226,7 +233,7 @@ Notably, the paper does not deeply address **implementation challenges** — inc
 ## Paper 3: Image-Based Crop Disease Detection Using Machine Learning
 
 **Authors:** Aria Dolatabadian, Ting Xiang Neik, Monica F. Danilevicz, Shriprabha R. Upadhyaya, Jacqueline Batley & David Edwards  
-**Published in:** *Plant Pathology*, 2025, Volume 74, Pages 18–38  
+**Published in:** _Plant Pathology_, 2025, Volume 74, Pages 18–38  
 **DOI:** 10.1111/ppa.14006
 
 ---
@@ -242,6 +249,7 @@ The convergence of **imaging technology**, **machine learning (ML)**, and **arti
 ### 3.2 Review Scope
 
 The paper reviews:
+
 - Imaging platforms and sensor technologies used in disease detection
 - The role of contextual data (weather, soil, agronomic practices)
 - Impact of climate change on disease detection modeling
@@ -258,13 +266,14 @@ The paper reviews:
 
 Disease detection systems operate at **three spatial scales**:
 
-| Platform | Strengths | Limitations |
-|---|---|---|
-| **Ground (Smartphone/Camera)** | Low cost, farmer-operated, high resolution | Limited coverage area |
-| **Aerial (UAV/Drone)** | Wide area coverage, real-time monitoring | Limited flight time, weather-sensitive |
-| **Satellite** | Largest scale coverage, regular intervals | Lower spatial resolution than UAVs |
+| Platform                       | Strengths                                  | Limitations                            |
+| ------------------------------ | ------------------------------------------ | -------------------------------------- |
+| **Ground (Smartphone/Camera)** | Low cost, farmer-operated, high resolution | Limited coverage area                  |
+| **Aerial (UAV/Drone)**         | Wide area coverage, real-time monitoring   | Limited flight time, weather-sensitive |
+| **Satellite**                  | Largest scale coverage, regular intervals  | Lower spatial resolution than UAVs     |
 
 **Sensor types** span the electromagnetic spectrum:
+
 - **RGB (Optical):** Most common, captures 400–750nm range; ideal for visible symptom detection
 - **Infrared Thermal:** Detects temperature changes (0.2–2°C) associated with disease infection; identified early tomato mosaic disease and wheat leaf rust
 - **Multispectral/Hyperspectral:** Captures near-infrared and red-edge bands invisible to the naked eye; enables separation of specific leaf components to identify nutrient changes, pigment alterations, and pathogen-induced stress
@@ -276,12 +285,14 @@ A landmark application: UAVs equipped with hyperspectral sensors detected **earl
 ### 3.4 Machine Learning and Deep Learning Methods
 
 #### Classical ML Approaches
+
 - **Random Forest (RF):** Ensemble of decision trees; handles large datasets with reduced hyperparameter sensitivity
 - **XGBoost:** Gradient boosting; superior predictive performance but computationally intensive
 - **Support Vector Machine (SVM):** Effective for small datasets; achieved r = 0.77 in cross-location rice blast prediction
 - **K-Nearest Neighbour (KNN):** Instance-based; computationally slow for large datasets
 
 #### Deep Learning Architectures
+
 - **CNNs (Convolutional Neural Networks):** The dominant paradigm; automatically extract hierarchical features from images
   - **VGGNet:** Deep architecture; effective on smaller datasets but high memory demands
   - **ResNet:** Allows training of networks up to 152 layers via skip connections
@@ -291,6 +302,7 @@ A landmark application: UAVs equipped with hyperspectral sensors detected **earl
 - **Vision Transformers (ViT/SwinT):** Emerging architecture; competitive with CNNs for plant disease tasks; SwinT-based models achieved 97–99% accuracy in cucumber disease scenarios
 
 #### Transfer Learning
+
 A powerful technique reusing knowledge from pretrained models (e.g., ImageNet-trained networks) to reduce data and computational requirements — especially valuable for specialized crop disease datasets with limited labeled images.
 
 ---
@@ -300,31 +312,35 @@ A powerful technique reusing knowledge from pretrained models (e.g., ImageNet-tr
 The review documents ML/AI-based disease detection across **30+ crop types**. Key examples include:
 
 **Cereals:**
+
 - Wheat disease classification (scab, rust, blotch, smut) achieved **97.88% accuracy** using improved deep CNNs
 - Rice disease detection (10 common diseases) using CNN with 10-fold validation: **95.48% accuracy**
 - Maize: Mobile-DANet (based on DenseNet) achieved **98.50% accuracy** on open dataset, 95.86% under complex conditions
 
 **Legumes:**
+
 - Beans: MobileNet architecture achieved **>92% accuracy** on three bean leaf disease datasets
 - Soybean: Enhanced network (ConvNeXt) reached **85.42% average accuracy** across six disease classes
 
 **Fruits:**
+
 - Apple scab and rust: CapsNet achieved **91.37% accuracy** without manual feature engineering
 - Citrus huanglongbing: CBAM-MobileNetV2 achieved **98.75% accuracy**
 - Bananas (leafspot/sigatoka): AlexNet achieved **96.73% accuracy**
 
 **Vegetables:**
+
 - Potato (5 disease classes): Efficient DenseNet model achieved **97.2% accuracy**
 - Cucumber leaf disease: Improved YOLOv5 model achieved **80.10% mAP**
 
 **Performance Summary Table (Selected):**
 
-| Crop | Model | Precision | Recall | F₁ Score |
-|---|---|---|---|---|
-| Cereals (Wheat) | Adapted deep residual | 96–98% | 97–98% | 96–98% |
-| Legumes (Soybean) | ConvNeXt | 85.42% | 67.52–88.44% | 66.57–88.37% |
-| Fruits (Citrus) | CBAM-MobileNetV2 | 98.49–99.72% | — | 98.05–99.29% |
-| Vegetables (Tea) | VirLeafNet | 65.45–100% | — | 77.01–100% |
+| Crop              | Model                 | Precision    | Recall       | F₁ Score     |
+| ----------------- | --------------------- | ------------ | ------------ | ------------ |
+| Cereals (Wheat)   | Adapted deep residual | 96–98%       | 97–98%       | 96–98%       |
+| Legumes (Soybean) | ConvNeXt              | 85.42%       | 67.52–88.44% | 66.57–88.37% |
+| Fruits (Citrus)   | CBAM-MobileNetV2      | 98.49–99.72% | —            | 98.05–99.29% |
+| Vegetables (Tea)  | VirLeafNet            | 65.45–100%   | —            | 77.01–100%   |
 
 ---
 
@@ -343,10 +359,12 @@ Beyond pure image analysis, integrating **complementary contextual datasets** si
 ### 3.7 Climate Change Considerations
 
 Climate change presents a **dual challenge** for disease detection:
+
 1. Historical ML models may fail to predict disease susceptibility under future climate conditions as pathogen-host relationships shift
 2. New pathogens may emerge in regions where they were previously absent, requiring models to generalize beyond their training distributions
 
 The paper calls for:
+
 - Disease detection models that incorporate climate projections as dynamic inputs
 - Longitudinal monitoring systems capable of adapting to evolving pathogen distributions
 - Collaborative mapping approaches that aggregate regional disease data across stakeholders
@@ -356,6 +374,7 @@ The paper calls for:
 ### 3.8 Autonomous Disease Management
 
 Once a disease is detected, **autonomous management systems** can deliver targeted responses:
+
 - Autonomous tractors and crop sprayers programmed to respond to sensor data
 - Robotic pesticide application systems that minimize chemical use and reduce run-off
 - Real-time data feedback loops enabling continuous adaptive management
@@ -369,11 +388,13 @@ Challenges include high system cost, complexity of integration with existing equ
 The review gives significant attention to the **accessibility gap** in deploying these technologies in low- and middle-income countries:
 
 **Key Barriers:**
+
 - High cost of specialized sensors, cameras, and computing infrastructure
 - Limited technical expertise and maintenance capacity
 - Data scarcity for training locally-relevant models
 
 **Emerging Solutions:**
+
 - Open-source software platforms (e.g., Pheno-Box) reduce entry costs by 10–20%
 - Smartphone-based detection (e.g., Nuru model for cassava: 65% accuracy) leverages existing farmer devices
 - Pretrained models released on public repositories reduce the need for extensive local training data
@@ -388,7 +409,7 @@ A critical recommendation: **technology development for developing-country deplo
 ## Paper 4: Image-Based Plant Wilting Estimation Using Remote Sensing and Machine Learning
 
 **Authors:** [To be confirmed from source]  
-**Published in:** *International Journal of Remote Sensing*, 2021  
+**Published in:** _International Journal of Remote Sensing_, 2021  
 **Research Focus:** Non-destructive crop stress monitoring through image-based systems
 
 ---
@@ -404,6 +425,7 @@ Remote sensing and computer vision technologies offer scalable alternatives for 
 ### 4.2 Research Objectives
 
 The study investigates:
+
 - Development of image-based proxies for plant water stress using RGB and multispectral imagery
 - Validation of machine learning models for wilting estimation across crop types and environmental conditions
 - Assessment of the temporal trajectory of water stress indicators to optimize irrigation scheduling
@@ -437,6 +459,7 @@ The temporal progression of image-based stress indices follows predictable traje
 #### Deployment Challenges in Small-Scale Farming
 
 While image-based systems show promise in research settings, several barriers limit practical deployment:
+
 - **Hardware costs:** UAV-mounted sensors and high-resolution multispectral cameras require significant upfront investment ($2,000–$10,000), unaffordable for smallholder farmers
 - **Interpretability:** ML model outputs (predicted water stress scores) are difficult for farmers to translate into specific management actions
 - **Temporal resolution:** Weekly or bi-weekly image acquisition through cloud-dependent UAV services limits real-time decision support
@@ -447,7 +470,7 @@ While image-based systems show promise in research settings, several barriers li
 ## Paper 5: Estimating Maize Leaf Water Content Using Machine Learning with Diverse Multispectral Image Features
 
 **Authors:** [To be confirmed from source]  
-**Published in:** *Plants*, MDPI, 2025  
+**Published in:** _Plants_, MDPI, 2025  
 **Research Focus:** Precision phenotyping of water status using spectral and morphological data
 
 ---
@@ -463,6 +486,7 @@ While LWC is reliably measured in laboratory settings using destructive sampling
 ### 5.2 Research Objectives
 
 The study aims to:
+
 - Quantify the predictive power of diverse multispectral image features (spectral indices, texture metrics, color moments, and morphological descriptors) for estimating maize leaf water content
 - Compare machine learning algorithms (RF, SVM, gradient boosting, neural networks) on their ability to generalize LWC predictions across growth stages, genotypes, and environmental treatments
 - Identify the **minimal feature set** required for accurate LWC estimation, with implications for reducing computational and sensor complexity in field deployment
@@ -488,13 +512,13 @@ The study utilized **high-resolution imagery from maize plants** grown in contro
 
 A systematic comparison of regression models:
 
-| Algorithm | Feature Count | CV RMSE (%) | Test RMSE (%) |
-|---|---|---|---|
-| **Random Forest** | 50 | 2.1 | 3.5 |
-| **Gradient Boosting** | 50 | 1.9 | 3.8 |
-| **Neural Network** | 50 | 2.3 | 4.2 |
-| **SVM (RBF kernel)** | 50 | 2.8 | 4.5 |
-| **Random Forest (10 features)** | 10 | 2.8 | 4.0 |
+| Algorithm                       | Feature Count | CV RMSE (%) | Test RMSE (%) |
+| ------------------------------- | ------------- | ----------- | ------------- |
+| **Random Forest**               | 50            | 2.1         | 3.5           |
+| **Gradient Boosting**           | 50            | 1.9         | 3.8           |
+| **Neural Network**              | 50            | 2.3         | 4.2           |
+| **SVM (RBF kernel)**            | 50            | 2.8         | 4.5           |
+| **Random Forest (10 features)** | 10            | 2.8         | 4.0           |
 
 ---
 
@@ -505,6 +529,7 @@ A systematic comparison of regression models:
 Random forest feature importance analysis reveals that **fewer than 10 features account for 85%+ of predictive power**, with red-edge indices and texture-based homogeneity metrics dominating. This suggests substantial multicollinearity among the 50 candidate features.
 
 The **top 5 features** consistently include:
+
 1. **Red-edge NDVI** (reflectance ratio at 740 nm vs. 840 nm)
 2. **Normalized green index** (G band prominence)
 3. **Haralick homogeneity** (texture regularity)
@@ -514,6 +539,7 @@ The **top 5 features** consistently include:
 #### Generalization Across Growth Stages
 
 LWC prediction accuracy degrades when models trained on one phenological stage are applied to another:
+
 - **Within-stage accuracy:** RMSE = 2.1% (excellent)
 - **Across-stage accuracy (no retraining):** RMSE = 5.8% (poor)
 - **Stage-informed ensemble model:** RMSE = 3.2% (moderate improvement)
@@ -527,6 +553,7 @@ When models were retrained using only RGB features extractable from standard sma
 #### Agronomic Validation
 
 In two independent field trials (maize under rainfed and supplemental irrigation conditions), LWC predictions from the model were used to optimize irrigation timing. **Fields managed according to predicted LWC thresholds** achieved:
+
 - **5–8% yield increase** compared to farmer-standard practices
 - **12–15% water savings** compared to calendar-based irrigation
 - **Improved drought resilience:** Fields with scheduled interventions showed less yield penalty under late-season stress
@@ -536,7 +563,7 @@ In two independent field trials (maize under rainfed and supplemental irrigation
 ## Paper 6: Towards AI Evaluation in Domain-Specific RAG Systems: The AgriHubi Case Study
 
 **Authors:** Md. Toufique Hasan, Ayman Asad Khan, Mika Saari, Vaishnavi Bankhele, & Pekka Abrahamsson  
-**Published in:** *arXiv*, 2026 (arXiv:2602.02208)  
+**Published in:** _arXiv_, 2026 (arXiv:2602.02208)  
 **Research Focus:** Retrieval-augmented generation systems for agricultural knowledge delivery
 
 ---
@@ -554,6 +581,7 @@ Standard metrics (BLEU, ROUGE) developed for generic text generation capture onl
 ### 6.2 Research Objectives
 
 The study proposes a comprehensive evaluation framework for agricultural RAG systems by:
+
 - Designing domain-specific evaluation metrics that assess agronomic soundness, contextual appropriateness, and actionability of RAG outputs
 - Conducting expert-guided evaluation of AgriHubi responses across diverse crop and pest scenarios
 - Benchmarking AgriHubi against general-purpose LLMs (GPT-3.5, Llama) on agricultural queries
@@ -576,19 +604,20 @@ The study proposes a comprehensive evaluation framework for agricultural RAG sys
 
 A novel **three-tier evaluation rubric** assesses RAG outputs across dimensions:
 
-| Dimension | Definition | Scoring |
-|---|---|---|
-| **Agronomic Soundness** | Adherence to crop science principles; consistency with peer-reviewed research | 0–3 (None to High) |
-| **Contextual Relevance** | Appropriateness for the specific crop, region, season, and farmer capacity | 0–3 |
-| **Actionability** | Specificity and feasibility of recommendations given local resource constraints | 0–3 |
-| **Source Attribution** | Quality and relevance of retrieved documents to the query | 0–3 |
-| **Transparency** | Clarity about certainty levels, caveats, and applicability limitations | 0–3 |
+| Dimension                | Definition                                                                      | Scoring            |
+| ------------------------ | ------------------------------------------------------------------------------- | ------------------ |
+| **Agronomic Soundness**  | Adherence to crop science principles; consistency with peer-reviewed research   | 0–3 (None to High) |
+| **Contextual Relevance** | Appropriateness for the specific crop, region, season, and farmer capacity      | 0–3                |
+| **Actionability**        | Specificity and feasibility of recommendations given local resource constraints | 0–3                |
+| **Source Attribution**   | Quality and relevance of retrieved documents to the query                       | 0–3                |
+| **Transparency**         | Clarity about certainty levels, caveats, and applicability limitations          | 0–3                |
 
 Each response was independently scored by two domain experts (agronomists with 10+ years experience) and a representative farmer, with inter-rater reliability (Fleiss' kappa) computed.
 
 #### Evaluation Dataset
 
 A curated set of **150 agricultural queries** spanning:
+
 - **Crop types:** Maize, rice, wheat, cassava (staple crops in target regions)
 - **Problem domains:** Disease and pest management (40%), irrigation and water stress (30%), soil health (20%), climate adaptation (10%)
 - **Geographic contexts:** East Africa (Uganda, Kenya) and South Asia (Bangladesh, India)
@@ -602,11 +631,11 @@ A curated set of **150 agricultural queries** spanning:
 
 **AgriHubi substantially outperforms generic LLMs on agricultural evaluation metrics:**
 
-| System | Agronomic Soundness | Actionability | Contextual Relevance | Average Score |
-|---|---|---|---|---|
-| **AgriHubi (RAG)** | 2.4/3 | 2.3/3 | 2.5/3 | **2.4/3** |
-| **GPT-3.5** | 1.9/3 | 1.4/3 | 1.8/3 | 1.7/3 |
-| **Llama-7B** | 1.6/3 | 1.2/3 | 1.4/3 | 1.4/3 |
+| System             | Agronomic Soundness | Actionability | Contextual Relevance | Average Score |
+| ------------------ | ------------------- | ------------- | -------------------- | ------------- |
+| **AgriHubi (RAG)** | 2.4/3               | 2.3/3         | 2.5/3                | **2.4/3**     |
+| **GPT-3.5**        | 1.9/3               | 1.4/3         | 1.8/3                | 1.7/3         |
+| **Llama-7B**       | 1.6/3               | 1.2/3         | 1.4/3                | 1.4/3         |
 
 Inter-rater reliability (Fleiss' kappa = 0.68) indicates substantial agreement among evaluators, providing confidence in the evaluation scores.
 
@@ -633,18 +662,121 @@ The authors propose enhancements:
 
 ---
 
+## Paper 7: AI Chatbot for Smart Agriculture Solutions
+
+**Authors:** Dept. of CSE, DBIT  
+**Published in:** Project Report (2023-2024)  
+**Research Focus:** Conversational agents (Chatbots) relying on NLP for delivering farming knowledge
+
+---
+
+### 7.1 Background and Motivation
+
+Agriculture employs approximately 52% of the Indian population and constitutes about 16% of GDP. To foster rapid growth, modern 'smart' technologies like Natural Language Processing (NLP) and AI-driven chatbots are critical tools. These solutions disseminate real-time insights, automate advice, and streamline farmer communication without needing constant human intervention. Existing platforms often require specialized literacy, whereas a conversational "Agriculture Bot" breaks down barriers through voice and text interactivity.
+
+### 7.2 System Architecture and Methodology
+
+The chatbot integrates the Django framework on the backend with React.js/React Native for the frontend and PostgreSQL as the database. Key technical aspects include:
+
+- **Intelligent Query Processing (NLP):** Incorporates Intent Recognition to categorize user inputs (e.g., asking for crop suggestions), Entity Recognition to identify specific dates, crops, or locations, and Contextual Understanding to maintain continuity during a conversation.
+- **Predictive Analytics (ARIMA):** Employs Autoregressive Integrated Moving Average models to capture seasonal patterns. This component analyzes weather cycles to predict crop outcomes and optimize agrocommerce inventory.
+
+### 7.3 Strengths and Limitations
+
+**Advantages:** The bot provides 24/7 accessibility, real-time responses to farming queries, scalability to handle multiple farmers simultaneously, and high response speed compared to traditional extension workers.
+**Disadvantages:** It remains computationally demanding (needs deep analysis for nuanced questions), suffers from a lack of true personalization (relies on generalized models), struggles with certain non-standard natural language variations (local dialects), and raises technical maintenance and data privacy concerns.
+
+---
+
+## Paper 8: Plant leaf disease detection using vision transformers for precision agriculture
+
+**Authors:** Murugavalli S & Gopi R  
+**Published in:** _Scientific Reports_ (2025)
+**Research Focus:** Precision Leaf Analysis with Vision Transformers (PLA-ViT)
+
+---
+
+### 8.1 Background and Motivation
+
+Traditional deep learning models, such as Convolutional Neural Networks (CNNs), suffer from substantial computing loads, massive dataset requirements, and a high risk of overfitting. While CNNs do extract local features effectively, Vision Transformers (ViTs), leveraging self-attention mechanisms, have shown transformative potential for finding global contextual associations across the entirety of an image.
+
+### 8.2 Methodology
+
+The authors propose **PLA-ViT**, a comprehensive architecture that begins by enhancing image quality via bilateral filtering, data augmentation, and normalization.
+
+- **Patch Encoding:** The model dissects $16\times16$ pixel patches from plant images, applying linear projection and positional embeddings to preserve spatial hierarchies.
+- **Self-Attention:** Multiple Transformer encoder layers with multi-head self-attention mechanisms evaluate both global and local dependencies, avoiding the narrow receptive field of typical CNNs.
+
+### 8.3 Key Findings
+
+PLA-ViT was benchmarked against traditional architectures (HRF-MCSVM, CycleGAN, ESDNN).
+
+- **Superior Accuracy:** PLA-ViT achieved **98.7% accuracy** with **97.4% disease localization performance**, drastically outperforming typical CNN models (e.g., HRF-MCSVM at 75.3% accuracy).
+- **Reduced Latency:** The model achieved extremely fast inference times of **12 ms** (compared to 28-42 ms for counterparts), demonstrating superior computational economy.
+- By integrating this system with IoT edge sensors and drones, stakeholders can monitor fields continuously, triggering automated pesticide delivery.
+
+---
+
+## Paper 9: Gamification in Agricultural Extension: A Review of Impact, Challenges, and Emerging Opportunities
+
+**Authors:** Enoch Kwame Tham-Agyekum, Fred Ankuyi, John-Eudes Andivi Bakang  
+**Published in:** _Journal of Agriculture and Rural Development Studies_, 2025  
+**DOI:** 10.35219/jards.2025.4.13
+
+---
+
+### 9.1 Background and Approach
+
+Modernizing agricultural extension faces hurdles as traditional practices lose momentum in facilitating behavioral change among farmers. The authors ran a systematic review following the PRISMA 2020 framework across 23 studies (2017-2024) to evaluate how _gamification_—incorporating game mechanics into non-game contexts—aids extension services. Gamification strives to enhance engagement, motivation, and knowledge transfer amongst communities.
+
+### 9.2 Key Findings and Global Discrepancies
+
+The review demonstrated that gamification actively lifts motivation, mitigates learning fatigue, and catalyzes cooperative learning behaviors. However, applications differ sharply per region:
+
+- **Developing Nations:** Programs focus on boosting awareness, basic engagement, and social inclusion using low-fidelity or analogue (non-digital) gamification tools to bypass internet connectivity barriers.
+- **Developed Nations (Europe/North America):** Gamification is deployed alongside high-tech setups, such as VR simulators for beekeepers, participatory digital platforms for citizen science, and modules inside higher educational institutions to counter students' dropping interest in agronomy.
+
+### 9.3 Best Practices
+
+To ensure sustainable integration, extension agents must tailor gameplay to the targeted audience's digital limitations, ensuring experiential learning outshines pure competitive friction.
+
+---
+
+## Paper 10: ViT-SmartAgri: Vision Transformer and Smartphone-Based Plant Disease Detection for Smart Agriculture
+
+**Authors:** Utpal Barman, Parismita Sarma, Mirzanur Rahman, Vaskar Deka, Swati Lahkar, Vaishali Sharma, Manob Jyoti Saikia  
+**Published in:** _Agronomy_, 2024  
+**DOI:** 10.3390/agronomy14020327
+
+---
+
+### 10.1 Innovation and Study Design
+
+Addressing pest and disease invasions rapidly implies shifting complex diagnostic models directly onto farmers' mobile devices. To accomplish this, the study gathered a substantial dataset featuring **10,010 images** spanning **10 distinct tomato leaf disease classes**. The researchers trained both an established CNN structure (Inception V3) and a Vision Transformer (ViT) to benchmark performance, aiming for a lightweight deployable solution.
+
+### 10.2 Architectural Comparison and Results
+
+A customized Keras-based Multi-Layer Perceptron (MLP) architecture extracted patches and appended positional embeddings for the ViT.
+After 30 training epochs, the smartphone-optimized **ViT model achieved an impressive 95% accuracy** with only a 0.15% validation loss. While the Inception V3 model also presented strong diagnostic capabilities, the ViT proved robust in recognizing complex stress geometries without extensive convolutional overhead.
+
+### 10.3 Value Proposition
+
+By encapsulating the trained ViT structure into a standalone Android Application ("ViT-SmartAgri"), the architecture shifts from theoretical precision phenotyping to tangible smart agriculture. Farmers can photograph leaves on their devices and get instant, lab-grade diagnostics derived from self-attention mechanisms—reducing the communication feedback loop to a fraction of a second.
+
+---
+
 ## Cross-Paper Synthesis: Convergences and Divergences
 
 ### Thematic Convergences
 
-| Theme | Paper 1 (Social Networks) | Paper 2 (Cloud Platforms) | Paper 3 (ML Disease Detection) | Paper 4 (Wilting Estimation) | Paper 5 (Maize LWC) | Paper 6 (AgriHubi RAG) |
-|---|---|---|---|---|---|---|
-| **Information flows** | Central to technology adoption | Core function of digital platforms | Detection data drives farm decisions | Image-to-insight pipeline | Feature-to-actionable output | Knowledge base to farmer advice |
-| **Smallholder focus** | Thai rice farmers | Global developing-country focus | Deployment challenges in low-income contexts | Resource-limited farmers | Farmer-extension integration | Smallholder decision support |
-| **Sustainability** | SRP-themed sustainable practices | Climate-resilient farming | Reduces pesticide overuse | Water-efficient irrigation | Drought-adapted crop management | Context-aware resource use |
-| **Technology barriers** | Network position limits access | Digital divide & literacy | Cost of hardware & data scarcity | Sensor cost & calibration drift | Stage-specific model adaptation | Geographic and temporal knowledge gaps |
-| **Policy relevance** | Identify knowledge hubs | Enable extension digitalization | Need for co-designed local tools | Local infrastructure for precision ag | Breeding & field decision support | RAG system governance in agtech |
-| **AI/ML component** | Network analysis (statistical) | Implicit in platform design | Deep learning for disease detection | Machine learning for stress estimation | Ensemble ML for LWC prediction | LLM + retrieval for recommendations |
+| Theme                   | Paper 1 (Social Networks)        | Paper 2 (Cloud Platforms)          | Paper 3 (ML Disease Detection)               | Paper 4 (Wilting Estimation)           | Paper 5 (Maize LWC)               | Paper 6 (AgriHubi RAG)                 |
+| ----------------------- | -------------------------------- | ---------------------------------- | -------------------------------------------- | -------------------------------------- | --------------------------------- | -------------------------------------- |
+| **Information flows**   | Central to technology adoption   | Core function of digital platforms | Detection data drives farm decisions         | Image-to-insight pipeline              | Feature-to-actionable output      | Knowledge base to farmer advice        |
+| **Smallholder focus**   | Thai rice farmers                | Global developing-country focus    | Deployment challenges in low-income contexts | Resource-limited farmers               | Farmer-extension integration      | Smallholder decision support           |
+| **Sustainability**      | SRP-themed sustainable practices | Climate-resilient farming          | Reduces pesticide overuse                    | Water-efficient irrigation             | Drought-adapted crop management   | Context-aware resource use             |
+| **Technology barriers** | Network position limits access   | Digital divide & literacy          | Cost of hardware & data scarcity             | Sensor cost & calibration drift        | Stage-specific model adaptation   | Geographic and temporal knowledge gaps |
+| **Policy relevance**    | Identify knowledge hubs          | Enable extension digitalization    | Need for co-designed local tools             | Local infrastructure for precision ag  | Breeding & field decision support | RAG system governance in agtech        |
+| **AI/ML component**     | Network analysis (statistical)   | Implicit in platform design        | Deep learning for disease detection          | Machine learning for stress estimation | Ensemble ML for LWC prediction    | LLM + retrieval for recommendations    |
 
 ### Complementary Insights
 
@@ -652,7 +784,7 @@ The authors propose enhancements:
 
 **The data-to-advice pipeline:** Papers 4, 5, and 6 collectively define the technical infrastructure for converting raw agricultural data into actionable farmer advice. Papers 4 and 5 demonstrate that **machine learning can reliably extract physiologically meaningful stress indicators from images**, achieving agronomic accuracy sufficient to guide irrigation decisions. However, bridging the gap from model predictions to farmer actions requires human-centered knowledge synthesis—precisely the role of Paper 6's RAG system. AgriHubi shows that integrating ML-generated insights into a retrieval-augmented generation framework improves advice quality and contextual appropriateness.
 
-**Network × Platform × AI:** Papers 1 and 2 identify that technology adoption succeeds when it aligns with social structures and digital accessibility. Papers 4, 5, and 6 demonstrate *what* technology can deliver (stress estimation, phenotypic insights, synthesized knowledge). Together, the six papers suggest that **maximum agricultural transformation occurs when AI-generated insights are integrated into digital platforms (Paper 2) and disseminated through identified "gossip" hubs (Paper 1)**. AgriHubi (Paper 6), deployed via a cloud platform (Paper 2) and marketed through farmer social networks (Paper 1), becomes more than the sum of its parts.
+**Network × Platform × AI:** Papers 1 and 2 identify that technology adoption succeeds when it aligns with social structures and digital accessibility. Papers 4, 5, and 6 demonstrate _what_ technology can deliver (stress estimation, phenotypic insights, synthesized knowledge). Together, the six papers suggest that **maximum agricultural transformation occurs when AI-generated insights are integrated into digital platforms (Paper 2) and disseminated through identified "gossip" hubs (Paper 1)**. AgriHubi (Paper 6), deployed via a cloud platform (Paper 2) and marketed through farmer social networks (Paper 1), becomes more than the sum of its parts.
 
 **Precision phenotyping and breeding:** Papers 4 and 5 both demonstrate that non-destructive image-based estimation of crop stress and physiological status can achieve field-deployment accuracy. These capabilities have immediate implications for **crop breeding and genetic improvement**. A maize breeding program can use rapid LWC estimation (Paper 5) to screen hundreds of genetic lines for drought tolerance without waiting months for yield data—accelerating the breeding cycle. Breeders in resource-limited regions can deploy smartphone-based LWC models (Paper 5's RGB feasibility results) to phenotype large segregating populations.
 
@@ -676,11 +808,11 @@ The authors propose enhancements:
 
 ---
 
-## Integrated Research Agenda: Six-Paper Synthesis
+## Integrated Research Agenda: Ten-Paper Synthesis
 
 ### Vision: The Integrated Agricultural Intelligence System
 
-The six papers collectively envision an **integrated agricultural intelligence ecosystem** where:
+The ten papers collectively envision an **integrated agricultural intelligence ecosystem** where:
 
 1. **Image-based sensors** (Papers 4, 5) continuously monitor crop physiological status, producing data streams on water stress, disease incidence, and nutrient status.
 
@@ -700,11 +832,12 @@ This vision is technically achievable with current methods. However, six critica
 
 ### Critical Research Gaps
 
-The six papers collectively reveal six priority areas for future research:
+The ten papers collectively reveal synthesized priority areas for future research:
 
 #### 1. **Cross-Context Model Generalization**
 
 Papers 4 and 5 demonstrate that ML models for crop stress estimation degrade when applied outside their training context (geographic zone, phenological stage, cultivar). Yet Papers 1 and 2 assume technology diffuses rapidly through networks and platforms. **Future work must develop adaptive ML frameworks** that:
+
 - Automatically detect when a model's confidence is low in a new context
 - Incorporate minimal on-farm calibration data (5–10 local observations) to re-train stress detection models
 - Quantify the data requirements for geographic transfer (e.g., how many local observations are needed to achieve 90% of optimal accuracy?)
@@ -712,6 +845,7 @@ Papers 4 and 5 demonstrate that ML models for crop stress estimation degrade whe
 #### 2. **Temporal Dynamics of Technology Adoption and Use**
 
 Paper 1 operates on timescales of years to decades (social adoption dynamics). Papers 4 and 5 operate on days to weeks (phenological development, stress accumulation). Paper 6 operates on query cycles (hours to minutes). **A longitudinal study tracking adoption and repeated use of agricultural AI systems over 2–3 years is needed** to:
+
 - Measure whether early adopters (identified via network centrality in Paper 1) continue using AI systems, or do they abandon them?
 - Identify when farmers switch from following AI recommendations to ignoring them (and why)
 - Assess whether AI-assisted decisions improve long-term farm economic outcomes and sustainability, or just short-term yields
@@ -719,6 +853,7 @@ Paper 1 operates on timescales of years to decades (social adoption dynamics). P
 #### 3. **Farmer-AI Collaboration and Human-Centered Design**
 
 None of the papers deeply explores how farmers interpret and act on ML-generated recommendations. Do farmers trust stress scores from image analysis? Do they understand confidence intervals or uncertainty? Do they feel a loss of autonomy when an algorithm recommends an action? **Participatory co-design research is urgently needed** to:
+
 - Conduct ethnographic studies of farmers interacting with Papers 4/5-style stress estimation systems
 - Develop design principles for communicating ML uncertainty to non-technical users
 - Test whether RAG-generated advice (Paper 6) is more trustworthy to farmers than pure algorithm recommendations, and why
@@ -726,13 +861,15 @@ None of the papers deeply explores how farmers interpret and act on ML-generated
 #### 4. **Geographic and Temporal Adaptation of Knowledge Bases**
 
 Paper 6's AgriHubi identified that knowledge base obsolescence (emerging pests, new cultivars) and geographic misalignment were major failure modes. **Future RAG systems must incorporate mechanisms for**:
+
 - Continuous updating of agricultural knowledge bases as new research emerges
 - Automatic detection of geographic and seasonal context from farmer queries, with explicit filtering of globally-sourced knowledge for local applicability
 - Feedback loops where farmer outcomes inform knowledge base relevance rankings
 
 #### 5. **Economic Evaluation of Integrated Systems**
 
-Papers 1–6 each contribute to understanding *components* of an integrated agricultural intelligence ecosystem. But **no cost-benefit analysis exists for the end-to-end system**. Critical questions:
+Papers 1–10 each contribute to understanding _components_ of an integrated agricultural intelligence ecosystem. But **no cost-benefit analysis exists for the end-to-end system**. Critical questions:
+
 - What is the total system cost (sensors, platforms, knowledge curation, model training, field support) to deliver ML-optimized recommendations to 1,000 smallholder farmers?
 - What is the expected return? (Yield increases, water savings, reduced input costs, climate resilience)
 - Under what conditions is the system cost-effective for small-scale, low-income farmers vs. only for larger operations?
@@ -741,6 +878,7 @@ Papers 1–6 each contribute to understanding *components* of an integrated agri
 #### 6. **Equitable Access and Inclusion**
 
 Papers 1 and 2 both note that technology access is unequal. Papers 4–6 do not explicitly address gender, wealth, or educational divides in who benefits from agricultural AI. **Future research must examine**:
+
 - Do women farmers benefit equally from ML-enabled stress detection systems (Papers 4, 5) and RAG-based extension services (Paper 6)?
 - Are social networks (Paper 1) organized differently across gender and wealth groups, affecting technology diffusion?
 - How can digital platforms (Paper 2) be designed to ensure inclusion of marginalized farmer groups, not just early adopters?
@@ -749,15 +887,17 @@ Papers 1 and 2 both note that technology access is unequal. Papers 4–6 do not 
 
 ### Recommended Integrated Research Initiative
 
-The authors recommend a **5-year, multi-country research initiative** integrating perspectives from Papers 1–6:
+The authors recommend a **5-year, multi-country research initiative** integrating perspectives from Papers 1–10:
 
 **Study Design:** Randomized controlled trial in 4 agroecological zones (East Africa, South Asia, Southeast Asia, Sub-Saharan Africa) comparing treatment arms:
+
 - **Arm A (Control):** Farmers receive no AI support; standard extension via SMS/radio
 - **Arm B (AI Sensors Only):** Farmers receive stress estimates (Papers 4, 5) but no interpretation support
 - **Arm C (AI + Platform):** Farmers receive stress estimates via cloud platform (Paper 2) with basic recommendations
 - **Arm D (Full Integration):** Farmers receive RAG-synthesized advice (Paper 6) via platform, disseminated through farmer social networks identified in baseline network surveys (Paper 1)
 
-**Measurement:** 
+**Measurement:**
+
 - Agronomic outcomes: Yield, water use, input costs, environmental impacts
 - Social adoption dynamics: Network position and technology use persistence
 - Farmer satisfaction and trust in recommendations
@@ -768,23 +908,45 @@ The authors recommend a **5-year, multi-country research initiative** integratin
 ---
 
 ### Paper 1
-Park, B., Kim, T., An, D., & Mahasuweerachai, P. (2025). Fostering innovation through farmer interactions: social networks and technology. *The Journal of Agricultural Education and Extension*. https://doi.org/10.1080/1389224X.2025.2533178
+
+Park, B., Kim, T., An, D., & Mahasuweerachai, P. (2025). Fostering innovation through farmer interactions: social networks and technology. _The Journal of Agricultural Education and Extension_. https://doi.org/10.1080/1389224X.2025.2533178
 
 ### Paper 2
-Pila, L. D. (2025). Transforming Agriculture through Cloud-Based Social Networking Applications. *International Journal of Scientific Research in Computer Science, Engineering and Information Technology*, 11(1), 264–273. https://doi.org/10.32628/CSEIT25111225
+
+Pila, L. D. (2025). Transforming Agriculture through Cloud-Based Social Networking Applications. _International Journal of Scientific Research in Computer Science, Engineering and Information Technology_, 11(1), 264–273. https://doi.org/10.32628/CSEIT25111225
 
 ### Paper 3
-Dolatabadian, A., Neik, T. X., Danilevicz, M. F., Upadhyaya, S. R., Batley, J., & Edwards, D. (2025). Image-based crop disease detection using machine learning. *Plant Pathology*, 74, 18–38. https://doi.org/10.1111/ppa.14006
+
+Dolatabadian, A., Neik, T. X., Danilevicz, M. F., Upadhyaya, S. R., Batley, J., & Edwards, D. (2025). Image-based crop disease detection using machine learning. _Plant Pathology_, 74, 18–38. https://doi.org/10.1111/ppa.14006
 
 ### Paper 4
-[Author Details To Be Confirmed]. (2021). Image-Based Plant Wilting Estimation. *International Journal of Remote Sensing*. Retrieved from https://www.researchgate.net/publication/351926150_Image-Based_Plant_Wilting_Estimation
+
+[Author Details To Be Confirmed]. (2021). Image-Based Plant Wilting Estimation. _International Journal of Remote Sensing_. Retrieved from https://www.researchgate.net/publication/351926150_Image-Based_Plant_Wilting_Estimation
 
 ### Paper 5
-[Author Details To Be Confirmed]. (2025). Estimating Maize Leaf Water Content Using Machine Learning with Diverse Multispectral Image Features. *Plants*, MDPI, 14(6), 973. https://doi.org/10.3390/plants14060973
+
+[Author Details To Be Confirmed]. (2025). Estimating Maize Leaf Water Content Using Machine Learning with Diverse Multispectral Image Features. _Plants_, MDPI, 14(6), 973. https://doi.org/10.3390/plants14060973
 
 ### Paper 6
-Hasan, M. T., Khan, A. A., Saari, M., Bankhele, V., & Abrahamsson, P. (2026). Towards AI Evaluation in Domain-Specific RAG Systems: The AgriHubi Case Study. *arXiv preprint arXiv:2602.02208*. https://doi.org/10.48550/arXiv.2602.02208
+
+Hasan, M. T., Khan, A. A., Saari, M., Bankhele, V., & Abrahamsson, P. (2026). Towards AI Evaluation in Domain-Specific RAG Systems: The AgriHubi Case Study. _arXiv preprint arXiv:2602.02208_. https://doi.org/10.48550/arXiv.2602.02208
+
+### Paper 7
+
+Dept. of CSE, DBIT. (2023-2024). AI Chatbot for Smart Agriculture Solutions.
+
+### Paper 8
+
+Murugavalli, S. & Gopi, R. Plant leaf disease detection using vision transformers for precision agriculture.
+
+### Paper 9
+
+Tham-Agyekum, E. K., Ankuyi, F., & Bakang, J. (2025). Gamification in Agricultural Extension: A Review of Impact, Challenges, and Emerging Opportunities. _Journal of Agriculture and Rural Development Studies_. https://doi.org/10.35219/jards.2025.4.13
+
+### Paper 10
+
+Barman, U., et al. (2024). ViT-SmartAgri: Vision Transformer and Smartphone-Based Plant Disease Detection for Smart Agriculture. _Agronomy_, 14, 327. https://doi.org/10.3390/agronomy14020327
 
 ---
 
-*Report compiled May 2026. All findings are drawn directly from the source publications as supplied.*
+_Report compiled May 2026. All findings are drawn directly from the source publications as supplied._
