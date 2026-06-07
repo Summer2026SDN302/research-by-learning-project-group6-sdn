@@ -1,3 +1,5 @@
+Link SRS của nhóm: https://docs.google.com/document/d/1zhMvEInWW8yMSxHacS33W92TWuqXo9NMUrrVcixBSjs/edit?usp=sharing
+
 # FARMDIARIES
 
 > Enterprise-grade smart agriculture and vision-powered farming platform for Vietnamese smallholder farmers.
