@@ -15,6 +15,9 @@ FarmDiaries is a mobile-first smart farming diary system that helps farmers reco
 | SRS Document | https://docs.google.com/document/d/1zhMvEInWW8yMSxHacS33W92TWuqXo9NMUrrVcixBSjs/edit?usp=sharing |
 | Project Specification | `FarmDiaries_ProjectSDN_Group6.pdf` |
 | Research Materials | `Reference Research Papers/` |
+| Paper Link (Overleaf) | https://www.overleaf.com/read/kdbvgcjrpxdn#ddb6b3 |
+| Frontend Repository | https://github.com/jayykioh/farmy-frontend |
+| Backend Repository | https://github.com/jayykioh/farmy-backend |
 
 ## Project Overview
 
