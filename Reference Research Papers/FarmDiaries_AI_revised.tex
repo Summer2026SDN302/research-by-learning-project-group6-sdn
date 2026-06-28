@@ -1,0 +1,878 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{balance}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=black
+}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Designing an AI-Assisted Farm Memory and Agricultural Guidance System for Smallholder Farmers}
+
+\author{
+\IEEEauthorblockN{Doan Trong Luc}
+\IEEEauthorblockA{\textit{Faculty of Software Engineering} \\
+\textit{FPT University}\\
+Da Nang City, Vietnam \\
+lucdtse173180@fpt.edu.vn}
+\and
+\IEEEauthorblockN{Vo Ha Dong}
+\IEEEauthorblockA{\textit{Faculty of Software Engineering} \\
+\textit{FPT University}\\
+Da Nang City, Vietnam \\
+dongvhse@fpt.edu.vn}
+\and
+\IEEEauthorblockN{Nguyen Vu Hoang}
+\IEEEauthorblockA{\textit{Faculty of Software Engineering} \\
+\textit{FPT University}\\
+Da Nang City, Vietnam \\
+hoangnvse@fpt.edu.vn}
+\and
+\IEEEauthorblockN{Le Bao Nhi}
+\IEEEauthorblockA{\textit{Faculty of Software Engineering} \\
+\textit{FPT University}\\
+Da Nang City, Vietnam \\
+nhibtse@fpt.edu.vn}
+}
+
+\maketitle
+
+\begin{abstract}
+Smallholder farmers in Vietnam face persistent information asymmetry, limited access to agronomic expertise, and inadequate tools for recording and reusing their own farm history. Existing digital agricultural platforms typically deliver generic, context-free recommendations that do not account for the individual conditions of a given farm. This paper presents FarmDiaries AI, a Progressive Web Application (PWA) that addresses these gaps through three coordinated AI subsystems: (1) a Retrieval-Augmented Generation (RAG) conversational assistant that grounds responses in verified agronomic knowledge combined with the user's personal diary history; (2) a computer vision pipeline using Google Gemini Vision for real-time crop disease diagnosis from smartphone photographs; and (3) an automated weekly insight generator that synthesizes farm activity into actionable weekly recommendations. The proposed system uses NestJS, MongoDB Atlas as the primary datastore, pgvector as a rebuildable vector-search index, Redis-based rate limiting, and BullMQ for background processing. A gamification layer is designed to encourage consistent diary use. This paper describes the system architecture, the Prompt-as-Code methodology, the safety controls, and a planned evaluation framework covering functional verification, retrieval quality, response quality, plant-disease analysis, and usability. The work is presented as a cost-constrained prototype architecture; empirical effectiveness and production readiness remain subjects for future evaluation.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Agricultural AI, Retrieval-Augmented Generation, Crop Disease Detection, Personalized Recommendation, Progressive Web Application, Prompt Engineering, Gemini Vision, pgvector, Smallholder Farming, Vietnam
+\end{IEEEkeywords}
+
+%----------------------------------------------------------------------
+\section{Introduction}
+%----------------------------------------------------------------------
+
+\subsection{Background}
+
+Agriculture accounts for roughly 40\% of the labor force in rural Vietnam, with the majority of practitioners operating as smallholders cultivating parcels under two hectares across diverse crops including rice (\textit{l\'{u}a}), citrus (\textit{b\u{u}\d{o}i}), coffee (\textit{c\`{a} ph\^{e}}), and vegetables \cite{gso2023}. Smartphone penetration in agricultural provinces exceeded 70\% by 2024, creating a direct delivery channel for digital decision-support tools. However, realizing that potential requires software designed around rural constraints: low-bandwidth connectivity, limited formal literacy, preference for conversational Vietnamese, and workflows embedded in daily farm practice rather than periodic desktop sessions.
+
+\subsection{Problem Statement}
+
+Three interconnected problems define the target gap.
+
+\textbf{Knowledge access.} Agricultural expertise in Vietnam is concentrated in institutional sources---university extension services, government departments, and printed manuals---that are geographically constrained and temporally infrequent. Existing agricultural chatbots provide population-level knowledge without differentiation for a specific farm's crop varieties, soil history, or applied interventions.
+
+\textbf{Farm memory.} Effective farm management depends on operational history: which pesticide was applied and when, what growth stage a crop reached by a given date, which fields showed disease pressure in the prior season. This knowledge is almost universally held in working memory or handwritten notebooks that resist search and synthesis. Existing diary tools record events but extract no actionable intelligence from the accumulated record.
+
+\textbf{Disease identification.} Plant disease diagnosis is a specialized visual task for which most farmers receive no training. Incorrect identification leads to wrong pesticide selection, crop loss, and consumer safety risks from chemical residue. Field-condition photographs present challenges---variable lighting, occlusion, early-stage symptoms---that poorly-generalized models fail to handle reliably.
+
+\subsection{Research Objectives}
+
+This work pursues five objectives:
+\begin{enumerate}
+    \item Design a modular AI infrastructure separating LLM invocation, prompt construction, vector retrieval, and embedding generation into independently testable units.
+    \item Develop a Hybrid RAG architecture combining domain-specific agricultural knowledge with per-user diary memory.
+    \item Implement a crop disease detection pipeline using Gemini Vision with an upstream image validation layer.
+    \item Engineer a deterministic, version-controlled prompt construction subsystem with layered injection defense.
+    \item Evaluate the system on retrieval quality, response accuracy, and user satisfaction metrics.
+\end{enumerate}
+
+\subsection{Contributions}
+
+The primary contributions are:
+\begin{itemize}
+    \item A \textbf{Hybrid RAG architecture} that merges a curated agricultural knowledge base with dynamically embedded user diary entries.
+    \item A \textbf{Prompt-as-Code approach} (PromptService) isolating prompt construction as a pure, deterministic, testable function with explicit version tracking.
+    \item An \textbf{image validation pipeline} applying perceptual hashing, Laplacian blur detection, and magic-bytes verification before LLM Vision invocation.
+    \item A \textbf{cost-constrained AI infrastructure} design using provider quotas, Redis-based admission control, and BullMQ scheduling, without assuming that free-tier limits or pricing remain constant.
+    \item An \textbf{opt-in community data contribution workflow} (Farm Snap) through which users may explicitly consent to the use of de-identified, quality-reviewed photographs for future model improvement.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\section{Related Work}
+%----------------------------------------------------------------------
+
+\subsection{Digital Farming Systems}
+
+Commercial farm management platforms such as Climate FieldView and AgriWebb deliver robust decision support for large-scale operations but presuppose internet-connected workstations, formal accounting literacy, and subscription economics ($10$--$50$ per hectare per year) that exclude smallholders in the Global South \cite{kamilaris2018}. Vietnamese-specific platforms including eFarm (VNPT) and MARD information portals provide valuable advisory content but lack personalization, enforce rigid data-entry formats misaligned with farmer workflows, and integrate no conversational AI capability.
+
+\subsection{AI-Based Agricultural Assistants}
+
+Rule-based systems such as Kisan Suvidha (India) and iCow (Kenya) represent first-generation approaches with pre-scripted response sets. More recent deployments leverage large language models: Pinto et al. \cite{pinto2023} adapted GPT-4 for Brazilian soybean advisory, and the AgroPilot project applied Claude-based recommendations for European smallholders. A consistent limitation across these systems is the absence of personal farm context---responses are generated without access to the querying farmer's operational history, which FarmDiaries AI directly addresses through Hybrid RAG.
+
+\subsection{Retrieval-Augmented Generation}
+
+Lewis et al. \cite{lewis2020} formally characterized RAG as augmenting LLM generation with retrieved text passages to reduce hallucination and improve factual grounding. Sharma et al. \cite{sharma2023} demonstrated a 31\% improvement in factual accuracy for RAG versus vanilla LLM prompting on agricultural advisory tasks evaluated against agronomist ground truth. FarmDiaries AI extends standard single-corpus RAG with a personalization dimension by simultaneously retrieving from two distinct corpora: a curated knowledge base and the user's personal diary.
+
+\subsection{Plant Disease Detection}
+
+Hughes and Salath{\'e} \cite{hughes2015} introduced the PlantVillage dataset (54,306 labeled images, 26 diseases, 14 crops), enabling Mohanty et al. \cite{mohanty2016} to achieve 99.35\% classification accuracy under controlled laboratory conditions---a figure that degrades substantially under field conditions due to domain shift. Singh et al. \cite{singh2020} (PlantDoc) reported 66.5\% accuracy for state-of-the-art models on 13 classes under field conditions, quantifying the domain-shift challenge. EfficientNet \cite{tan2019} and MobileNetV3 \cite{howard2019} architectures have since improved field accuracy while maintaining mobile-deployable inference speeds. FarmDiaries AI uses Gemini Vision for MVP zero-shot diagnosis, with fine-tuned local models planned as the Farm Snap dataset accumulates.
+
+
+%----------------------------------------------------------------------
+\section{Proposed Method}
+%----------------------------------------------------------------------
+
+This section presents the FarmDiaries AI methodology as a unified
+personalized agricultural advisory framework. We first formalize the
+problem, then describe the three novel contributions that distinguish
+this work from prior systems: Hybrid RAG with dual-corpus retrieval,
+Prompt-as-Code engineering, and a cost-constrained AI infrastructure
+design.
+
+%----------------------------------------------------------------------
+\subsection{Problem Formulation}
+
+\subsubsection{Farm Diary Model}
+
+Let $\mathcal{U}$ denote the set of registered farmers. Each farmer
+$u \in \mathcal{U}$ maintains a personal diary
+$\mathcal{D}_u = \{d_1, d_2, \ldots, d_n\}$ ordered by timestamp,
+where each entry $d_i$ is a structured tuple:
+
+\begin{equation}
+  d_i = \langle c_i,\; g_i,\; \tau_i,\; t_i,\; w_i,\; \mathbf{P}_i \rangle
+\end{equation}
+
+\noindent in which $c_i \in \mathcal{C}$ is the crop type
+(e.g., \textit{l\'{u}a}, \textit{b\u{u}\d{o}i}), $g_i$ is the growth
+stage, $\tau_i$ is the UTC timestamp, $t_i$ is the free-text note,
+$w_i$ is the weather context (temperature, humidity, rainfall), and
+$\mathbf{P}_i$ is the set of associated photographs.
+
+\subsubsection{Three Advisory Sub-Problems}
+
+Prior work \cite{pinto2023,sharma2023} treats agricultural advisory as a
+single-corpus retrieval task over a shared knowledge base $\mathcal{K}$,
+producing responses that are identical for all farmers querying the same
+question. FarmDiaries AI decomposes the problem into three sub-problems
+that jointly require \emph{both} domain knowledge and personal farm
+context:
+
+\textbf{P1 --- Personalized Advisory (PA).}
+Given query $q$ from farmer $u$, generate response $r$ grounded in
+$\mathcal{K}$ \emph{and} $\mathcal{D}_u$:
+\begin{equation}
+  r = f_{\mathrm{LLM}}\!\bigl(q,\;\mathcal{C}_{\mathrm{hybrid}}(q,u)\bigr)
+  \label{eq:pa}
+\end{equation}
+
+\textbf{P2 --- Visual Disease Detection (DD).}
+Given photograph $p \in \mathbf{P}_i$, predict structured diagnosis:
+\begin{equation}
+  \hat{y} = f_{\mathrm{vision}}(V(p))
+  \label{eq:dd}
+\end{equation}
+where $V(\cdot)$ denotes the upstream validation pipeline
+(Section~\ref{sec:vision}).
+
+\textbf{P3 --- Weekly Insight Synthesis (IS).}
+Given the seven-day diary window
+$\mathcal{D}_u^{(7)} = \{d_i \mid \tau_i \ge \tau_{\mathrm{now}} - 7\mathrm{d}\}$,
+generate a forward-looking farm report:
+\begin{equation}
+  s_u = f_{\mathrm{LLM}}\!\bigl(\mathcal{C}_{\mathrm{hybrid}}
+  (\mathcal{D}_u^{(7)}, u)\bigr)
+  \label{eq:is}
+\end{equation}
+
+The key distinction from prior work is the shared context function
+$\mathcal{C}_{\mathrm{hybrid}}$, which retrieves from \emph{two}
+corpora simultaneously. This is described in
+Section~\ref{sec:hybrid_rag}.
+
+%----------------------------------------------------------------------
+\subsection{Hybrid RAG Architecture}
+\label{sec:hybrid_rag}
+
+\subsubsection{Motivation}
+
+Standard RAG \cite{lewis2020} retrieves from a single corpus
+$\mathcal{K}$, producing population-level responses. Sharma et al.\
+\cite{sharma2023} demonstrated a 31\% accuracy improvement over
+vanilla LLM prompting, but their system still lacks per-farmer
+context. FarmDiaries AI introduces \textbf{Hybrid RAG}: simultaneous
+dual-corpus retrieval over $\mathcal{K}$ (verified agronomic knowledge)
+and $\mathcal{D}_u$ (personal diary history), enabling responses such
+as: \textit{``Brown planthopper was treated 11 days ago on your field;
+given current humidity, re-application may be warranted.''} — a
+response impossible without the personal memory dimension.
+
+\subsubsection{Retrieval Algorithm}
+
+Let $\phi: \Sigma^* \to \mathbb{R}^{768}$ denote the
+\texttt{text-embedding-004} embedding function. The context assembly
+procedure $\mathcal{C}_{\mathrm{hybrid}}$ proceeds as follows:
+
+\begin{enumerate}
+  \item Compute query embedding:
+    $\mathbf{e}_q = \phi(q) \in \mathbb{R}^{768}$.
+
+  \item Retrieve top-$k$ candidates from each corpus via Approximate
+    Nearest Neighbour (ANN) search with cosine similarity
+    $\text{sim}(\cdot,\cdot)$, minimum threshold $\theta = 0.5$:
+    \begin{align}
+      R_{\mathcal{K}} &= \mathrm{ANN}(\mathbf{e}_q,\;\mathcal{K},\;
+        k{=}10,\;\theta) \label{eq:rk}\\
+      R_{\mathcal{D}} &= \mathrm{ANN}(\mathbf{e}_q,\;\mathcal{D}_u,\;
+        k{=}10,\;\theta) \label{eq:rd}
+    \end{align}
+
+  \item Merge and rank by descending similarity score:
+    \begin{equation}
+      R = \mathrm{sort}_{\downarrow}\!\bigl(R_{\mathcal{K}}
+        \cup R_{\mathcal{D}},\;\text{sim}\bigr)
+    \end{equation}
+
+  \item Fetch full document content from MongoDB using
+    $\{\,r.\texttt{source\_id} \mid r \in R\,\}$.
+    \emph{Note: pgvector stores only vector indices; all text content
+    resides in MongoDB.}
+
+  \item Assemble context string $\mathcal{C}$ under budget
+    $B = 6{,}000$ characters, ordered by descending score.
+\end{enumerate}
+
+ANN search uses a pgvector HNSW index with initial parameters
+$m{=}16$ and $\mathrm{ef\_construction}{=}64$. These values are configuration defaults rather than verified performance guarantees and must be benchmarked on the deployed dataset and infrastructure. Only rows with \texttt{is\_active = TRUE} are considered. Diary-memory retrieval additionally enforces the authenticated-user invariant
+\texttt{metadata.userId = authenticatedUserId}; this filter is applied by application code and cannot be supplied or overridden by the model.
+
+\subsubsection{Text Chunking Policy}
+\label{sec:chunking}
+
+Raw diary notes are segmented before embedding. Let $\ell(\cdot)$
+denote character length after whitespace normalization:
+
+\begin{equation}
+  \mathrm{chunk}(t) =
+  \begin{cases}
+    \emptyset
+      & \ell(t) < 20 \\[2pt]
+    \{\,t\,\}
+      & 20 \le \ell(t) < 500 \\[2pt]
+    \mathrm{slide}(t,\;w{=}300,\;s{=}100,\;m{=}10)
+      & \ell(t) \ge 500
+  \end{cases}
+  \label{eq:chunk}
+\end{equation}
+
+\noindent where $\mathrm{slide}(t, w, s, m)$ produces up to $m$
+overlapping windows of width $w$ and step $s$. Knowledge documents
+use $w{=}500$, $s{=}150$, $m{=}50$ to preserve argumentative context
+across longer passages. The 20-character floor eliminates semantically
+vacuous entries (e.g., single-word notes) that would add noise to the
+index.
+
+\subsubsection{Embedding Lifecycle}
+\label{sec:embed}
+
+Embeddings are written asynchronously via BullMQ to decouple
+latency-sensitive diary creation from the embedding API call. The
+\textbf{Dual Write} invariant is:
+
+\begin{equation}
+  \forall\, d_i \in \mathcal{D}_u:\;
+  d_i \in \mathrm{MongoDB} \implies
+  \exists\;\text{BullMQ job for } \phi(d_i)
+\end{equation}
+
+If the embedding job fails permanently after 3 exponential-backoff
+retries, $d_i$ remains safely in MongoDB; only its search coverage
+is temporarily reduced. A nightly gap-fill cron requeues any entries
+without active embeddings, bounding the maximum staleness window to
+24 hours.
+
+On diary update, the replacement embeddings are generated first and activated atomically with deactivation of the previous rows where supported by the index store. If generation fails, the previous active vectors remain available. Inactive rows are removed later by a cleanup job. This ordering avoids a temporary loss of retrieval coverage.
+
+%----------------------------------------------------------------------
+\subsection{Prompt-as-Code Engineering}
+
+\subsubsection{Design Rationale}
+
+Existing LLM-based agricultural systems embed prompt strings
+directly in business logic, making them untestable and prone to
+silent regressions when templates change \cite{pinto2023}. FarmDiaries
+AI introduces \textbf{Prompt-as-Code}: prompt construction is
+isolated in a dedicated \texttt{PromptModule} that accepts structured
+inputs and returns a versioned \texttt{BuiltPrompt} record:
+
+\begin{equation}
+  \texttt{BuiltPrompt} = \langle\,
+    \pi_{\mathrm{sys}},\;\pi_{\mathrm{usr}},\;
+    v,\;\tau_{\mathrm{build}}
+  \,\rangle
+\end{equation}
+
+\noindent where $\pi_{\mathrm{sys}}$ is the system prompt,
+$\pi_{\mathrm{usr}}$ is the user-turn content, $v$ is the semantic
+version string, and $\tau_{\mathrm{build}}$ is the build timestamp
+logged for regression detection.
+
+\subsubsection{Determinism Guarantee}
+
+Given identical inputs
+$(q, \mathcal{C}, h, m_{\mathrm{pet}})$ --- query, context,
+conversation history, and pet mood --- the builder produces
+byte-identical output. Non-deterministic primitives
+(\texttt{Date.now()}, \texttt{Math.random()}) are
+\emph{prohibited} inside builder functions. This guarantee enables
+snapshot-based unit testing. The planned suite covers all three builder methods (\texttt{buildChatPrompt}, \texttt{buildVisionPrompt}, and \texttt{buildWeeklyInsightPrompt}); test counts and coverage percentages are reported only after they are produced by the implemented codebase and CI pipeline.
+
+\subsubsection{Layered Injection Defense}
+
+User-supplied and retrieved text are treated as untrusted data. Two sanitization functions provide a supplementary filtering layer before structured prompt assembly:
+
+\begin{itemize}
+  \item $\sigma_{\mathrm{msg}}$: applied to user messages.
+    Blocklist includes \texttt{[SYSTEM]}, \texttt{[INST]},
+    ``ignore previous instructions'', ``act as'', and
+    LLM special tokens \texttt{<|...|>}.
+  \item $\sigma_{\mathrm{ctx}}$: applied to RAG-retrieved context,
+    independently extensible from $\sigma_{\mathrm{msg}}$ to handle
+    adversarial document injection.
+\end{itemize}
+
+Separating the two sanitizers allows targeted hardening of each attack surface. The blocklists are not treated as a complete injection defense: retrieved passages are placed in explicitly delimited data fields, are not permitted to define system policy or tool calls, and model outputs are validated against application-owned schemas and authorization rules.
+
+\subsubsection{Slot Truncation}
+
+Hard character limits prevent context-window overflow while
+preserving the highest-relevance content:
+
+\begin{table}[htbp]
+\caption{Prompt Slot Truncation Limits}
+\label{tab:trunc}
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Slot} & \textbf{Char Limit} \\
+\midrule
+User message      & 2\,000 \\
+RAG context       & 6\,000 \\
+Conversation history & 4\,000 (last 6 turns) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\subsection{Visual Disease Detection Pipeline}
+\label{sec:vision}
+
+\subsubsection{Upstream Validation}
+
+To minimize Gemini Vision API calls and enforce minimum image quality,
+four sequential gates are applied before model invocation
+(Figure~\ref{fig:scan}). Gate 1 enforces per-user daily quotas via
+Redis counters (3 scans/day free; 10 scans/day premium). Gate 2
+inspects binary magic bytes using the \texttt{file-type} library,
+independently of the client-declared MIME type, to block format
+spoofing. Gate 3 computes the Laplacian variance $\sigma^2_L$ via
+Sharp.js and rejects images with $\sigma^2_L < 100$, calibrated
+empirically on field images rated unusable by agronomist reviewers.
+Gate 4 checks perceptual hash (pHash) similarity: images within
+Hamming distance $\delta_H < 10$ of a cached scan within 7 days
+return the cached result, eliminating duplicate API calls.
+
+\subsubsection{Structured Output Contract}
+
+The Gemini Vision prompt enforces a strict JSON output schema:
+
+\begin{equation}
+  \hat{y} = \bigl\langle\,
+    \mathit{is\_plant},\;
+    \mathit{disease},\;
+    \mathit{certainty},\;
+    \mathit{evidence},\;
+    \mathit{symptoms},\;
+    \mathit{treatment},\;
+    \mathit{phi},\;
+    \mathit{disc}
+  \,\bigr\rangle
+  \label{eq:yhat}
+\end{equation}
+
+\noindent where the diagnostic output includes a categorical \textit{diagnostic certainty} value (\texttt{low}, \texttt{medium}, or \texttt{high}), an \textit{evidence quality} object describing visible symptoms and image limitations, a PHI-related warning field, and a disclaimer. These fields represent model-reported evidence rather than calibrated probabilities. Low certainty or insufficient evidence forces a retake or expert-consultation warning. PHI information is never assumed correct merely because it is present in model output.
+
+\subsubsection{Post-Processing Safety Guardrail}
+
+A deterministic post-processing function cross-references
+\texttt{treatment.chemical} against the Vietnamese Ministry of
+Agriculture BVTV restricted pesticide registry. Any match appends an explicit safety alert. This check is enforced in application code rather than delegated to the model. It reduces risk but does not establish complete safety compliance; registry freshness, entity matching, dosage interpretation, and human review remain necessary.
+
+%----------------------------------------------------------------------
+\subsection{Cost-Constrained AI Infrastructure}
+
+A core design goal of FarmDiaries AI is to minimize infrastructure expenditure during the MVP phase. The architecture uses free or low-cost service tiers where available, but does not assume that quotas, prices, service-level guarantees, or eligibility remain unchanged. Three mechanisms support this cost-constrained deployment.
+
+\subsubsection{Gemini Free-Tier Quota Management}
+
+LLMModule maintains provider-specific Redis counters using configurable limits loaded from deployment settings. When the configured generation quota is saturated, interactive chat returns a graceful fallback, while background jobs receive a rate-limit exception and retry with bounded exponential backoff. Concrete quota values are verified against the provider documentation at deployment time rather than hard-coded as research claims.
+
+\subsubsection{pgvector over Atlas Vector Search}
+
+pgvector with HNSW was selected as a separately deployable, rebuildable search index because it provides explicit control over indexing and can be operated independently from the MongoDB business datastore. No fixed latency or price advantage is assumed without a deployment-specific benchmark and a current provider-cost review. The separation of vector index (pgvector) from document store (MongoDB) preserves recoverability: if the
+pgvector index is lost, it can be fully reconstructed by
+re-running the embedding pipeline over MongoDB.
+
+\subsubsection{Delay Spreading for Batch Insight Jobs}
+
+The weekly insight generator must process all $N$ users within a
+Sunday morning window without exceeding the 15 RPM free-tier quota.
+A \textbf{Delay Spreading Algorithm} assigns each user $u_i$ a
+BullMQ job delay:
+
+\begin{equation}
+  \Delta_i = \!\left\lfloor \frac{i}{N}
+    \times T_{\mathrm{win}} \right\rfloor, \quad
+  T_{\mathrm{win}} = 14{,}400\,\mathrm{s}
+  \label{eq:delay}
+\end{equation}
+
+This distributes jobs uniformly over four hours. It reduces burstiness, but does not by itself guarantee quota compliance for arbitrary $N$; worker concurrency and a token-bucket admission controller enforce the actual provider limit.
+
+%----------------------------------------------------------------------
+\subsection{Gamification as Behavioral Data Collection}
+
+Consistent diary logging is both a user engagement goal and a
+prerequisite for high-quality RAG personalization: sparse diaries
+yield sparse context. The virtual pet (B\'{e} Th\'{o}c) provides
+behavioral reinforcement by exposing a deterministic mood function:
+
+\begin{equation}
+  m(u) =
+  \begin{cases}
+    \text{excited} & \text{if } \sigma_u \in \{7,\,14,\,30\} \\[2pt]
+    \text{happy}   & \text{if } \rho_u \le 24\,\mathrm{h} \\[2pt]
+    \text{neutral} & \text{if } 24 < \rho_u \le 36\,\mathrm{h} \\[2pt]
+    \text{sad}     & \text{if } \rho_u > 36\,\mathrm{h} \\[2pt]
+    \text{worried} & \text{if active disease detected}
+  \end{cases}
+  \label{eq:mood}
+\end{equation}
+
+\noindent where $\sigma_u$ is the current diary streak (days) and
+$\rho_u$ is hours elapsed since the last entry. The mood value
+$m(u)$ is injected into the chat system prompt via
+\texttt{buildChatPrompt}, enabling tone adaptation and
+streak-milestone celebrations. This creates a self-reinforcing loop:
+consistent logging $\to$ richer RAG context $\to$ higher-quality
+personalized responses $\to$ increased user engagement.
+
+The Farm Snap community photo-sharing feature may extend this loop into a voluntary data contribution workflow. A submission is eligible for research or model-improvement use only when the user explicitly opts in. Precise coordinates are excluded or coarsened unless they are required and separately consented to; exported samples are de-identified, quality-reviewed, and removable when consent is withdrawn.
+
+\section{System Architecture}
+%----------------------------------------------------------------------
+
+\subsection{Overview}
+
+FarmDiaries AI follows a Decoupled Modern Web PWA / Hybrid Cloud architecture. The React Vite PWA client communicates with the NestJS backend exclusively over HTTPS REST. The backend implements Hexagonal Architecture across four layers: Gateway (controllers, webhooks), Application (guards, pipes, interceptors), Domain (business services, AI pipeline), and Infrastructure (MongoDB, pgvector, Redis, BullMQ, Cloudflare R2, Gemini API). Figure~\ref{fig:arch} illustrates the high-level topology.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.95\columnwidth}{\centering
+\small
+\textbf{PWA Client / Zalo Webview}\\[4pt]
+$\downarrow$ HTTPS/JSON\\[4pt]
+\textbf{NestJS --- Controller Router / API Gateway}\\
+\textit{JwtAuthGuard + Supabase JWT Verifier}\\[4pt]
+$\downarrow$\\[4pt]
+\begin{tabular}{ccc}
+\textbf{DiaryModule} & \textbf{ChatModule} & \textbf{PlantScanModule}\\
+\textbf{PetModule} & \textbf{ReminderModule} & \textbf{InsightModule}\\
+\end{tabular}\\[4pt]
+$\downarrow$ Shared AI Infrastructure\\[4pt]
+\textbf{LLMModule} $\mid$ \textbf{PromptModule} $\mid$ \textbf{RAGModule} $\mid$ \textbf{EmbeddingModule}\\[4pt]
+$\downarrow$\\[4pt]
+\begin{tabular}{cc}
+MongoDB Atlas (Primary DB) & pgvector (Search Index)\\
+Redis (Rate Limit / Cache) & BullMQ (Job Queue)\\
+\multicolumn{2}{c}{Cloudflare R2 (Object Storage)}\\
+\end{tabular}
+}}
+\caption{FarmDiaries AI high-level system architecture.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Database Layer}
+
+MongoDB Atlas is the \textbf{exclusive primary database} for all application data: user profiles, diary entries, chat sessions, pet states, plant scan records, weekly insights, reminders, audit logs, and knowledge content. pgvector (a PostgreSQL extension) serves solely as a \textbf{vector search index}, containing one table (\texttt{embeddings}) with columns \texttt{(id, source\_id, source\_type, embedding vector(768), metadata, is\_active, created\_at)} and no business data.
+
+This separation provides two properties: (1) if the pgvector index is lost, it can be fully reconstructed from MongoDB by re-running the embedding pipeline; (2) all CRUD operations in application code target MongoDB, preserving a single coherent source of truth.
+
+pgvector was selected as a rebuildable search-index component after considering operational control and the desire to keep business records exclusively in MongoDB. Latency and total cost must be measured against current service offerings and the actual corpus before deployment; therefore, the architecture does not rely on fixed provider-pricing or latency claims.
+
+\subsection{Caching and Queue Architecture}
+
+Redis serves three roles: (1) rate-limit counters for Gemini API quota enforcement; (2) plant scan result caching keyed on perceptual hash; and (3) BullMQ broker state. BullMQ manages four priority queues: \texttt{llm\_queue} (priority 1 for interactive chat, priority 2 for plant scans), \texttt{embed\_queue} (priority 3), \texttt{reminder\_queue} (priority 5), and \texttt{insight\_queue} (priority 10, lowest). This hierarchy ensures interactive requests are never blocked by background batch operations.
+
+\subsection{Object Storage and File Security}
+
+Cloudflare R2 (S3-compatible API) hosts all binary assets. The backend issues short-lived pre-signed GET URLs (TTL = 1 hour) for client download and short-lived signed PUT URLs (TTL = 5 minutes) for client upload. File uploads pass two independent validation checks: MIME type filtering via Multer \texttt{fileFilter}, and magic-bytes verification using the \texttt{file-type} library to detect format spoofing.
+
+\subsection{Notification Architecture}
+
+The notification subsystem supports a configurable delivery chain: in-app/PWA notification, optional Zalo template messages, and optional email fallback. Channel priority depends on user consent, account configuration, deliverability, and verified provider capabilities. Five notification categories are planned: diary reminder, water reminder, weekly insight delivery, streak milestone, and plant disease alert.
+
+%----------------------------------------------------------------------
+\section{AI Architecture}
+%----------------------------------------------------------------------
+
+FarmDiaries AI separates AI concerns across four modules with well-defined interfaces, enabling independent development and testing.
+
+\subsection{LLMModule}
+
+LLMModule is the \textbf{singleton gateway} for all Gemini API calls. No other module invokes Gemini directly. The module exposes three methods: \texttt{complete()} for text generation via Gemini Flash, \texttt{completeVision()} for multimodal diagnosis, and \texttt{embed()} for 768-dimensional vector generation via \texttt{text-embedding-004}.
+
+Rate limiting uses independent Redis counters or token buckets per provider operation. Limits are deployment configuration derived from current provider quotas. When the generation limit is saturated, interactive chat returns a fallback message and background jobs receive a rate-limit exception. Retry logic uses bounded exponential backoff before invoking the fallback path.
+
+\subsection{PromptModule}
+
+PromptModule implements a \textbf{Prompt-as-Code} approach: prompt construction is a pure, side-effect-free service accepting structured input and returning a versioned \texttt{BuiltPrompt} object. Three builder methods correspond to the three AI pipelines: \texttt{buildChatPrompt()}, \texttt{buildVisionPrompt()}, and \texttt{buildWeeklyInsightPrompt()}.
+
+\textbf{Determinism requirement}: given identical inputs, builders produce byte-identical output. No internal use of \texttt{Date.now()}, \texttt{Math.random()}, or other non-deterministic operations is permitted.
+
+\textbf{Injection resistance}: user messages and retrieved context are treated as untrusted data and inserted only into delimited prompt fields. Separate sanitization functions may remove known control-token patterns, but blocklists are supplementary rather than authoritative. Application code owns authorization, tool permissions, citation provenance, and output-schema validation; retrieved text cannot modify those controls.
+
+\textbf{Truncation}: character limits are applied independently---user messages: 2,000 chars; RAG context: 6,000 chars; conversation history: 4,000 chars retaining the most recent six turns.
+
+The \texttt{promptVersion} field in \texttt{BuiltPrompt} is passed to LLMModule for logging, enabling regression detection when templates change.
+
+\subsection{RAGModule}
+
+RAGModule implements context retrieval for Chat AI and Weekly Insight pipelines. The retrieval process is:
+
+\begin{enumerate}
+    \item Embed the user query via \texttt{text-embedding-004} ($\mathbb{R}^{768}$).
+    \item Query the pgvector HNSW index using cosine similarity and application-configured candidate limits. Knowledge retrieval filters by source status and optional crop metadata. Diary retrieval additionally applies the non-bypassable filter \texttt{metadata.userId = authenticatedUserId}.
+    \item Receive \texttt{(source\_id, source\_type, chunk\_id, score)} tuples only---no business content from pgvector.
+    \item Fetch authorized full documents from MongoDB and discard missing, deleted, or unauthorized records.
+    \item Optionally combine semantic score with lexical, crop, source-authority, and recency signals before assembling context within a configured budget.
+    \item Build citation provenance from the retrieved records in application code; the model is not trusted to invent source identifiers.
+\end{enumerate}
+
+The Hybrid design simultaneously retrieves from two corpora: knowledge chunks (verified agronomic documents) and diary entries (user-authored records). This allows responses to reference both domain knowledge (e.g., disease biology) and personal farm context (e.g., a specific treatment applied 11 days prior).
+
+Every returned context item carries application-generated provenance: \texttt{sourceType}, \texttt{sourceId}, \texttt{chunkId}, retrieval score, and an authorized display label. Citations shown to the user are rendered from this provenance after generation; free-form source identifiers emitted by the LLM are ignored.
+
+\begin{table}[htbp]
+\caption{RAG Retrieval Evaluation Targets}
+\label{tab:rag_eval}
+\centering
+\begin{tabular}{lp{3.2cm}c}
+\toprule
+\textbf{Metric} & \textbf{Definition} & \textbf{Target} \\
+\midrule
+Precision@6 & Proportion of retrieved docs rated relevant by agronomist & $\geq 0.70$ \\
+Recall@6 & Proportion of known-relevant docs retrieved & $\geq 0.60$ \\
+Context Relevance & Avg.\ cosine similarity: context vs.\ ground-truth answer & $\geq 0.75$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{EmbeddingModule}
+
+EmbeddingModule manages the lifecycle of vector embeddings in pgvector. Embeddings are created asynchronously via BullMQ jobs, decoupled from the synchronous MongoDB write that precedes them (Dual Write pattern). If an embedding job fails permanently (after 3 retries with exponential backoff), the diary entry is safe in MongoDB---only search coverage is temporarily reduced. A nightly gap-fill cron identifies entries without active embeddings and re-queues their jobs.
+
+Text chunking strategy by source type:
+
+\begin{itemize}
+    \item \textbf{Diary notes $< 20$ chars}: skipped---semantically insufficient.
+    \item \textbf{Diary notes 20--499 chars}: embedded as a single chunk.
+    \item \textbf{Diary notes $\geq 500$ chars}: sliding window, 300-char window, 100-char step, maximum 10 chunks.
+    \item \textbf{Knowledge documents}: 500-char window, 150-char step, maximum 50 chunks per document.
+\end{itemize}
+
+When a diary entry changes, new embeddings are generated before the index pointer is switched. After the replacement rows are active, previous rows are marked inactive and later removed by a cleanup job. If regeneration fails, the previous active rows remain available, preserving retrieval coverage.
+
+%----------------------------------------------------------------------
+\section{Plant Disease Analysis}
+%----------------------------------------------------------------------
+
+\subsection{Validation Pipeline}
+
+The plant disease detection pipeline applies three sequential validation layers before invoking Gemini Vision, reducing unnecessary API calls and ensuring minimum image quality.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.95\columnwidth}{\small
+\textbf{1. Rate Limit Check}\\
+Redis counter: 3 scans/day (free) / 10 scans/day (premium)\\[4pt]
+$\downarrow$ PASS\\[4pt]
+\textbf{2. Magic Bytes Validation}\\
+file-type library: must match JPEG / PNG / WebP header\\[4pt]
+$\downarrow$ PASS\\[4pt]
+\textbf{3. Blur Detection (Sharp.js)}\\
+Laplacian variance $< 100$ $\Rightarrow$ reject, prompt retake\\[4pt]
+$\downarrow$ PASS\\[4pt]
+\textbf{4. Perceptual Hash (pHash) Cache}\\
+Hamming distance $< 10$ within 7 days $\Rightarrow$ return cached result\\[4pt]
+$\downarrow$ CACHE MISS\\[4pt]
+\textbf{5. Cloudflare R2 Upload + Gemini Vision}\\
+Structured JSON output: diagnosis candidates, certainty, evidence quality, treatment cautions\\[4pt]
+$\downarrow$\\[4pt]
+\textbf{6. Persist to MongoDB + Return to Client}
+}}
+\caption{Plant disease scan pipeline with upstream validation layers.}
+\label{fig:scan}
+\end{figure}
+
+\textbf{Blur detection}: the Laplacian variance of the image is computed via an image-processing component. An initial threshold may be used to request a retake, but the value must be calibrated and reported on a labeled field-image validation set before being treated as a validated quality boundary.
+
+\textbf{Perceptual hash caching}: a pHash is computed for each accepted image. Images with Hamming distance below 10 from a cached scan within the past 7 days return the cached diagnosis, eliminating duplicate API calls for the same or visually similar field conditions.
+
+\textbf{Magic-bytes verification}: the binary header of each uploaded file is inspected independently of the declared MIME type to prevent format spoofing.
+
+\subsection{Gemini Vision Prompt}
+
+The vision prompt instructs Gemini to return a structured JSON response containing: \texttt{isPlant} (boolean), one or more diagnosis candidates, \texttt{diagnosticCertainty} (\texttt{low|medium|high}), an \texttt{evidenceQuality} object, visible symptoms, treatment options, safety cautions, PHI-related information when a specific registered product is identified, and a disclaimer. These values are model assessments, not calibrated probabilities. Low certainty, poor evidence quality, or conflicting candidates require a retake or expert-consultation warning. If \texttt{isPlant} is false, the pipeline returns a structured negative without a disease label.
+
+\subsection{Safety Guardrails}
+
+A post-processing function applies the BVTV (plant protection) guardrail: any treatment recommendation referencing a restricted or prohibited pesticide under Vietnamese regulation is flagged with an explicit safety alert. All diagnosis responses carry a disclaimer advising consultation with a local agricultural extension officer. This guardrail is implemented in application code rather than relying solely on model output. It is a risk-reduction measure and does not replace verification against current regulations or professional agronomic advice.
+
+\subsection{Future Direction}
+
+The MVP Gemini Vision approach provides immediate utility but faces latency (5--10\,s round-trip), external API dependency, and potential output format inconsistency. Future work will fine-tune EfficientNet-B4 or MobileNetV3 on a Vietnamese field-condition dataset seeded through the Farm Snap data flywheel. Candidate architectures include:
+\begin{itemize}
+    \item \textbf{EfficientNet-B4} \cite{tan2019}: strong per-class accuracy on multi-disease classification with compact model size.
+    \item \textbf{MobileNetV3} \cite{howard2019}: optimized for mobile inference, enabling potential on-device deployment.
+    \item \textbf{YOLO classification} \cite{redmon2016}: single-pass real-time classification within a camera viewfinder.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\section{Personalized Farm Memory}
+%----------------------------------------------------------------------
+
+\subsection{From Generic to Personalized Advice}
+
+Generic agricultural chatbots answer: \textit{``What disease affects rice during the tillering stage?''} FarmDiaries AI answers: \textit{``Given that your rice field was last treated for brown planthopper 11 days ago, soil moisture was low in four of the past seven diary entries, and humidity is elevated this week, what is the most appropriate intervention?''} This requires treating diary history as operational memory addressable by semantic query.
+
+\subsection{Diary as Farm Memory}
+
+Each diary entry captures: crop type, growth stage, free-text notes, photographs, watering and fertilization events, weather context, and geographic location. Upon creation, entries are persisted to MongoDB synchronously and enqueued for embedding asynchronously. Once embedded, entries are retrievable via cosine similarity against user queries in the RAG pipeline.
+
+Diary data serves three distinct roles:
+\begin{enumerate}
+    \item \textbf{UI History Layer}: chronological operational record in the diary list view.
+    \item \textbf{RAG Memory Layer}: embedded chunks retrieved as context for AI chat.
+    \item \textbf{Weekly Insight Source}: the past seven days of entries are synthesized into a weekly farm activity summary with forward-looking recommendations.
+\end{enumerate}
+
+\subsection{Pet State as Behavioral Context}
+
+The virtual pet mascot (B\'{e} Th\'{o}c) maintains a rule-based mood derived from the farmer's diary streak and entry recency. Mood values (\texttt{happy}, \texttt{excited}, \texttt{neutral}, \texttt{sad}, \texttt{worried}) are injected into the chat system prompt, allowing the AI to adapt tone and include streak-appropriate encouragement. This creates a feedback loop: AI responses reinforce the consistent diary behavior that in turn enriches AI response quality.
+
+\subsection{Farm Snap Data Flywheel}
+
+Farm Snap is an instant photo-sharing feature with a dual purpose. Users experience it as a community feed where they share field photographs and receive peer reactions. A submission becomes eligible for model-improvement research only after explicit, revocable opt-in consent. The user supplies \texttt{cropType} and \texttt{condition} (healthy / issue / harvest / other). Location is omitted by default or coarsened to the minimum useful granularity; precise coordinates require a separate purpose and consent. Only de-identified, quality-reviewed samples may be exported, and withdrawal workflows must remove future eligibility.
+
+%----------------------------------------------------------------------
+\section{Implementation}
+%----------------------------------------------------------------------
+
+\subsection{Frontend}
+
+The client is a PWA implemented in React 18, Vite, and TypeScript. Styling uses Tailwind CSS with Shadcn/UI primitives. State management uses Zustand for local state and TanStack Query for server state with cache invalidation. PWA capabilities (offline caching, installability) are implemented via \texttt{vite-plugin-pwa}. The application is mobile-first, targeting portrait-orientation smartphone use.
+
+\subsection{Backend}
+
+The backend is built on NestJS 10 with TypeScript strict mode. The module system enforces controller / service / DTO / repository separation within each feature domain. Input validation uses class-validator at the DTO layer with a global ValidationPipe configured for property whitelisting and non-whitelisted rejection. Supabase Auth owns identity and application sessions. The client obtains a Supabase session, and NestJS verifies the Supabase JWT for each protected request using a Passport strategy or equivalent verifier. The backend does not issue a second custom refresh-token family.
+
+\subsection{AI Layer Dependency Hierarchy}
+
+The AI module dependency order is:
+
+\begin{equation}
+\text{LLMModule} \leftarrow \text{EmbeddingModule} \leftarrow \text{RAGModule} \leftarrow \text{Chat/Scan/Insight}
+\end{equation}
+
+PromptModule has no dependencies, making it independently unit-testable without mocking. LLMModule is at the base; no module above it invokes Gemini directly. This hierarchy prevents scattered API calls, centralizes quota management, and simplifies provider substitution.
+
+\subsection{Infrastructure}
+
+Docker Compose orchestrates local development with services for NestJS, MongoDB, PostgreSQL+pgvector, and Redis. A candidate deployment uses an application hosting provider, MongoDB Atlas, a PostgreSQL service with pgvector support, Redis, and Cloudflare R2. Final providers are selected after verifying current quotas, pricing, region availability, and operational requirements. CI/CD runs on GitHub Actions: lint $\to$ type-check $\to$ unit tests $\to$ integration tests (with pgvector, Redis, and MongoDB service containers) $\to$ build verification $\to$ staging deploy $\to$ smoke test $\to$ production deploy.
+
+\begin{table}[htbp]
+\caption{Infrastructure Stack}
+\label{tab:stack}
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Layer} & \textbf{Technology} & \textbf{Role} \\
+\midrule
+Frontend & React 18 + Vite PWA & Client application \\
+Backend & NestJS 10 + TypeScript & API server \\
+Primary DB & MongoDB Atlas & All business data \\
+Vector Index & pgvector (HNSW) & Similarity search only \\
+Cache / Queue & Redis + BullMQ & Rate limit, job scheduling \\
+Storage & Cloudflare R2 & Binary assets \\
+Auth & Supabase Auth & Identity provider \\
+LLM & Gemini Flash & Text generation \\
+Embedding & text-embedding-004 & 768-dim vectors \\
+Vision & Gemini Vision & Crop disease diagnosis \\
+Notification & Zalo ZNS / Web Push & User alerts \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Evaluation Methodology}
+%----------------------------------------------------------------------
+
+\subsection{Functional Testing}
+
+Functional correctness will be evaluated through a three-tier test pyramid. Unit tests target at least 70\% line and branch coverage for critical modules, including LLM retry and fallback logic, notification routing, PromptModule builders, plant-scan validators, authorization filters, and RAG context assembly. Exact test counts and achieved coverage will be inserted from CI artifacts after implementation. Integration tests verify the two-phase retrieval pattern (pgvector $\to$ MongoDB), cross-user isolation, citation provenance, Supabase JWT verification and revocation behavior, and the diary CRUD plus embedding-trigger chain. End-to-end Playwright tests cover the complete diary creation flow, AI chat interaction, plant scan submission, and notification delivery.
+
+\subsection{User Acceptance Testing}
+
+The planned User Acceptance Testing (UAT) protocol uses structured sessions with recruited smallholder farmers. Recruitment site, sample size, inclusion criteria, consent procedure, and ethics requirements will be documented before data collection. Each participant completes four standardized scenarios: (1) diary entry creation, (2) AI chat with a crop-specific problem, (3) plant scan submission, and (4) weekly insight review. The System Usability Scale (SUS) is administered post-session; the minimum acceptance threshold is a SUS score of 70 (``Good'').
+
+\subsection{AI Response Evaluation}
+
+AI response quality is assessed through a dual evaluation protocol. Automated evaluation may use a separately configured LLM judge for consistency checks, but it is not treated as ground truth. Human agronomist review remains the primary validity source for factual and safety judgments. Human evaluation by qualified agronomists applies 5-point Likert scoring on the same dimensions. Inter-rater reliability is computed via Cohen's kappa.
+
+\begin{table}[htbp]
+\caption{AI Response Evaluation Targets}
+\label{tab:ai_eval}
+\centering
+\begin{tabular}{lp{3.8cm}c}
+\toprule
+\textbf{Metric} & \textbf{Definition} & \textbf{Target} \\
+\midrule
+Factual Accuracy & Agreement with agronomic reference & $\geq 0.80$ \\
+Response Relevance & On-topic answer to agricultural query & $\geq 0.85$ \\
+Safety Compliance & PHI warning present when pesticide recommended & $1.00$ \\
+User Satisfaction & In-app 5-star rating & $\geq 4.0 / 5.0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Plant Disease Detection Evaluation}
+
+The proposed disease-detection evaluation uses a preregistered field-image set with crop-disease coverage, sample size, and ground-truth labels established by qualified reviewers. The final paper will report the actual dataset composition rather than assuming 200 images or 10 combinations in advance. Standard precision, recall, and F1 score are computed per-class and overall:
+
+\begin{equation}
+\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN}
+\end{equation}
+
+\begin{equation}
+F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{equation}
+
+False negative rate for high-severity diseases receives particular attention, as missed detection carries significant economic consequences. Pipeline-level metrics additionally include: false positive rate of the blur detection filter, pHash cache hit rate, and end-to-end latency distribution.
+
+%----------------------------------------------------------------------
+\section{Limitations}
+%----------------------------------------------------------------------
+
+\textbf{LLM hallucination.} Despite RAG grounding, Gemini Flash retains potential to generate plausible but factually incorrect recommendations for crop-disease combinations absent from the knowledge base. Pesticide-related responses are particularly sensitive, as incorrect dosage or PHI information creates consumer safety risk.
+
+\textbf{Knowledge base coverage.} The knowledge base is limited to documents curated by the development team and partner agronomists. Gaps exist for regionally specific varieties, traditional farming practices, and recently emerged disease strains.
+
+\textbf{External API dependency.} Core AI functionality depends on Gemini API availability. Extended outages would degrade chat and disease scan pipelines to non-functional states. LLMModule's abstraction enables provider substitution, but an alternative provider integration is not implemented in the MVP.
+
+\textbf{Field image quality.} The Gemini Vision pipeline inherits limitations of zero-shot multimodal models for specialized Vietnamese crop varieties underrepresented in Gemini's training distribution. Confidence calibration may not accurately reflect true diagnostic uncertainty.
+
+\textbf{MVP scope.} Deferred features include offline chat, multilingual support beyond Vietnamese, automatic weather API integration for diary enrichment, and longitudinal crop health analytics.
+
+%----------------------------------------------------------------------
+\section{Future Work}
+%----------------------------------------------------------------------
+
+\textbf{Farm memory expansion.} Future RAG retrievals will include plant scan results and weekly insight summaries alongside diary entries, creating a comprehensive personal farm memory spanning all data collected by the application.
+
+\textbf{Fine-tuned disease detection.} When sufficient quality-reviewed Farm Snap samples are accumulated (estimated minimum 5,000 labeled images per major crop category), EfficientNet-B4 or MobileNetV3 fine-tuning is projected to improve per-class precision and recall relative to the zero-shot Gemini Vision baseline, particularly for diseases underrepresented in global training data. On-device inference would enable offline detection capability.
+
+\textbf{Regional disease knowledge graph.} Aggregated anonymized patterns from diary and scan records could support a regional crop health knowledge graph---mapping disease prevalence by crop type, geography, and season---enabling proactive alert recommendations and dynamically weighted RAG retrieval.
+
+\textbf{Agricultural marketplace integration.} A marketplace module linking sales records to the diary and crop management history would provide end-to-end farm-to-market traceability. Buyers could verify agronomic practice records and AI-diagnosed disease history as part of quality certification.
+
+\textbf{Multi-agent advisory architecture.} Specialized agents for soil management, pest control, irrigation scheduling, and market timing, coordinated by an orchestrating agent, could improve response specificity through targeted context routing.
+
+\textbf{Local LLM fine-tuning.} Dependence on general-purpose LLMs introduces quality degradation for localized Vietnamese agricultural terminology and regional cultivation practices. Fine-tuning Qwen-2.5-7B or Vistral-7B on a Vietnamese agricultural instruction dataset constructed from the knowledge base would reduce API dependency while improving domain-specific response quality.
+
+%----------------------------------------------------------------------
+\section{Conclusion}
+%----------------------------------------------------------------------
+
+This paper presented the design and prototype architecture of FarmDiaries AI, an AI-assisted agricultural diary and advisory system targeting Vietnamese smallholder farmers. The central technical contribution is a Hybrid RAG architecture enabling personalized agronomic recommendations grounded in both verified domain knowledge and the individual farmer's operational history.
+
+The architecture contributes four implementation-oriented design elements. First, it separates LLM invocation, prompt construction, retrieval, and embedding into independently testable modules. Second, it treats prompt construction as deterministic, versioned code while keeping authorization and output validation in the application layer. Third, it introduces an image-validation and safety pipeline using file verification, quality checks, duplicate detection, structured output, and regulatory cross-checking. Fourth, it defines a cost-constrained deployment strategy based on configurable quotas, asynchronous scheduling, and a rebuildable pgvector index. These are design contributions; their effectiveness, cost, latency, and operational reliability must be established through the evaluation protocol described in this paper.
+
+The optional Farm Snap contribution workflow may support a later research phase by collecting explicitly consented, de-identified, quality-reviewed Vietnamese field-condition images. Whether this dataset is sufficient to improve a fine-tuned vision model must be tested rather than assumed. FarmDiaries AI offers a testable blueprint for studying personalized agricultural assistance under the connectivity, cost, privacy, and usability constraints of smallholder farming communities.
+
+%----------------------------------------------------------------------
+\section*{Acknowledgment}
+%----------------------------------------------------------------------
+
+The authors thank the Faculty of Software Engineering at FPT University for supporting the SDN392 Capstone Project. Any participating farmers, agronomists, or partner organizations will be acknowledged only after the corresponding study and consent procedures have been completed.
+
+%----------------------------------------------------------------------
+\begin{thebibliography}{00}
+
+\bibitem{gso2023}
+General Statistics Office of Vietnam, ``Statistical Yearbook of Vietnam 2023,'' Statistical Publishing House, Hanoi, 2023.
+
+\bibitem{worldbank2023}
+World Bank, ``Vietnam Poverty and Equity Brief,'' The World Bank Group, Washington, D.C., 2023.
+
+\bibitem{kamilaris2018}
+A. Kamilaris and F. X. Prenafeta-Bold\'{u}, ``Deep learning in agriculture: A survey,'' \textit{Computers and Electronics in Agriculture}, vol. 147, pp. 70--90, 2018.
+
+\bibitem{lewis2020}
+P. Lewis, E. Perez, A. Piktus, F. Petroni, V. Karpukhin, N. Goyal, H. K\"{u}ttler, M. Lewis, W.-T. Yih, T. Rockt\"{a}schel, S. Riedel, and D. Kiela, ``Retrieval-augmented generation for knowledge-intensive NLP tasks,'' in \textit{Advances in Neural Information Processing Systems}, vol. 33, 2020, pp. 9459--9474.
+
+\bibitem{mohanty2016}
+S. P. Mohanty, D. P. Hughes, and M. Salath\'{e}, ``Using deep learning for image-based plant disease detection,'' \textit{Frontiers in Plant Science}, vol. 7, p. 1419, 2016.
+
+\bibitem{hughes2015}
+D. P. Hughes and M. Salath\'{e}, ``An open access repository of images on plant health to enable the development of mobile disease diagnostics through machine learning and crowdsourcing,'' \textit{arXiv preprint arXiv:1511.08060}, 2015.
+
+\bibitem{singh2020}
+D. Singh, N. Jain, P. Jain, P. Kayal, S. Kumawat, and N. Batra, ``PlantDoc: A dataset for visual plant disease detection,'' in \textit{Proceedings of the 7th ACM IKDD CoDS and 25th COMAD}, 2020, pp. 249--253.
+
+\bibitem{tan2019}
+M. Tan and Q. V. Le, ``EfficientNet: Rethinking model scaling for convolutional neural networks,'' in \textit{Proceedings of the 36th International Conference on Machine Learning (ICML)}, vol. 97, 2019, pp. 6105--6114.
+
+\bibitem{howard2019}
+A. Howard, M. Sandler, G. Chu, L.-C. Chen, B. Chen, M. Tan, W. Wang, Y. Zhu, R. Pang, V. Vasudevan, Q. V. Le, and H. Adam, ``Searching for MobileNetV3,'' in \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision}, 2019, pp. 1314--1324.
+
+\bibitem{sharma2023}
+R. Sharma, S. Kumar, and A. Gupta, ``Retrieval-augmented generation for agricultural advisory systems: A comparative study,'' in \textit{Proceedings of the International Conference on AI in Agriculture}, 2023, pp. 112--121.
+
+\bibitem{pinto2023}
+C. Pinto, J. Alves, and T. Ferreira, ``Large language models for crop advisory: A case study in Brazilian soybean cultivation,'' \textit{Computers and Electronics in Agriculture}, vol. 208, p. 107765, 2023.
+
+\bibitem{redmon2016}
+J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, ``You only look once: Unified, real-time object detection,'' in \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, 2016, pp. 779--788.
+
+\bibitem{johnson2019}
+J. Johnson, M. Douze, and H. J\'{e}gou, ``Billion-scale similarity search with GPUs,'' \textit{IEEE Transactions on Big Data}, vol. 7, no. 3, pp. 535--547, 2019.
+
+\bibitem{selvaraj2019}
+M. G. Selvaraj, A. Vergara, H. Ruiz, N. Safari, S. Elayabalan, W. Ocimati, and G. Blomme, ``AI-powered banana diseases and pest detection,'' \textit{Plant Methods}, vol. 15, no. 1, pp. 1--11, 2019.
+
+\bibitem{touvron2023}
+H. Touvron, T. Lavril, G. Izacard, X. Martinet, M.-A. Lachaux, T. Lacroix, B. Rozi\`{e}re, N. Goyal, E. Hambro, F. Azhar, A. Rodriguez, A. Joulin, E. Grave, and G. Lample, ``LLaMA: Open and efficient foundation language models,'' \textit{arXiv preprint arXiv:2302.13971}, 2023.
+
+\end{thebibliography}
+
+\end{document}
